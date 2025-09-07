@@ -6,16 +6,14 @@ import { GameState, PlayerAction } from '../types';
 const API_URL = (import.meta as any).env.VITE_API_URL;
 const WS_URL = (import.meta as any).env.VITE_WS_URL;
 
-const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: number, bigBlind: number) => {
+const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: number, bigBlind: number, userId: string, initData: string) => {
   const [state, setState] = useState<GameState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const webSocketRef = useRef<WebSocket | null>(null);
-  
-  const userId = 'user-1'; // In a real app, this would come from auth
 
   useEffect(() => {
-    if (!WS_URL) {
-      console.error("VITE_WS_URL is not defined!");
+    if (!WS_URL || !userId || !initData) {
+      console.error("Missing WebSocket URL, userId, or initData!");
       return;
     }
 
@@ -25,13 +23,11 @@ const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: numb
     ws.onopen = () => {
       console.log('WebSocket connected');
       setIsConnected(true);
-      // Create or join a game once connected
-      // For this simulation, we'll send a simple join message.
-      // A real app would have table IDs, etc.
+      // Join a game with authentication data
       ws.send(JSON.stringify({
         type: 'joinGame',
         payload: {
-          userId,
+          initData,
           initialStack,
           numPlayers,
           blinds: { small: smallBlind, big: bigBlind }
@@ -66,7 +62,7 @@ const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: numb
     return () => {
       ws.close();
     };
-  }, [initialStack, numPlayers, smallBlind, bigBlind]); // Reconnect if game config changes
+  }, [initialStack, numPlayers, smallBlind, bigBlind, userId, initData]); // Reconnect if game config changes
 
   const dispatchPlayerAction = useCallback((action: PlayerAction) => {
     if (webSocketRef.current?.readyState === WebSocket.OPEN) {
@@ -85,7 +81,7 @@ const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: numb
     }
   }, [state, userId]);
 
-  return { state, dispatchPlayerAction, userId, isConnected };
+  return { state, dispatchPlayerAction, isConnected };
 };
 
 export default usePokerGame;

@@ -8,12 +8,21 @@ import { ExitIcon, SettingsIcon } from './Icons';
 import SettingsModal from './SettingsModal';
 import { AssetContext } from '../contexts/AssetContext';
 
+interface TelegramUser {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+}
+
 interface GameTableProps {
   table: TableConfig;
   initialStack: number;
   onExit: () => void;
   isGodMode: boolean;
   setIsGodMode: (active: boolean) => void;
+  telegramUser: TelegramUser;
+  initData: string;
 }
 
 const positions = [
@@ -27,10 +36,11 @@ const positions = [
 ];
 
 
-const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGodMode, setIsGodMode }) => {
+const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGodMode, setIsGodMode, telegramUser, initData }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { assets } = useContext(AssetContext);
-  const { state, dispatchPlayerAction, userId, isConnected } = usePokerGame(initialStack, table.maxPlayers, table.stakes.small, table.stakes.big);
+  const userId = telegramUser.id.toString();
+  const { state, dispatchPlayerAction, isConnected } = usePokerGame(initialStack, table.maxPlayers, table.stakes.small, table.stakes.big, userId, initData);
 
   if (!isConnected || !state) {
       return (

@@ -9,19 +9,35 @@ import { GameMode, TableConfig } from './types';
 
 type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE' | 'ADMIN';
 
+interface TelegramUser {
+  id: number;
+  first_name: string;
+  last_name?: string;
+  username?: string;
+}
+
 const AppContent: React.FC = () => {
   const [activeGame, setActiveGame] = useState<ActiveGame>('LOBBY');
   const [pokerTable, setPokerTable] = useState<TableConfig | null>(null);
   const [isGodMode, setIsGodMode] = useState(false);
   const [realMoneyBalance, setRealMoneyBalance] = useState(0.5); // Example: in ETH
   const [playMoneyBalance, setPlayMoneyBalance] = useState(10000);
+  
+  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [initData, setInitData] = useState<string>('');
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     const TWebApp = (window as any).Telegram?.WebApp;
     if (TWebApp) {
       TWebApp.ready();
       TWebApp.expand();
+      if (TWebApp.initDataUnsafe?.user) {
+          setTelegramUser(TWebApp.initDataUnsafe.user);
+          setInitData(TWebApp.initData);
+      }
     }
+    setIsInitializing(false);
   }, []);
 
   const handleEnterPoker = useCallback((table: TableConfig) => {
@@ -33,6 +49,25 @@ const AppContent: React.FC = () => {
     setPokerTable(null);
     setActiveGame('LOBBY');
   }, []);
+  
+  if (isInitializing) {
+    return (
+       <div className="w-screen h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-500"></div>
+          <p className="mt-4 text-xl">Initializing...</p>
+      </div>
+    );
+  }
+
+  if (!telegramUser || !initData) {
+     return (
+       <div className="w-screen h-screen bg-gray-900 flex flex-col items-center justify-center text-white p-4 text-center">
+          <h1 className="text-2xl font-bold text-red-500 mb-4">Authentication Error</h1>
+          <p className="text-lg">This application must be launched from within Telegram.</p>
+          <p className="text-gray-400 mt-2">Could not retrieve user data from Telegram WebApp.</p>
+      </div>
+    );
+  }
 
   if (activeGame === 'POKER' && pokerTable) {
     const initialStack = pokerTable.mode === GameMode.REAL_MONEY ? realMoneyBalance : playMoneyBalance;
@@ -43,6 +78,8 @@ const AppContent: React.FC = () => {
         onExit={handleExit}
         isGodMode={isGodMode}
         setIsGodMode={setIsGodMode}
+        telegramUser={telegramUser}
+        initData={initData}
       />
     );
   }

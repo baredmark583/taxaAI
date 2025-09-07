@@ -5,7 +5,7 @@ This is a full-stack multiplayer Texas Hold'em poker game designed to run as a T
 ## Architecture
 
 -   **Frontend:** A static site built with React and Vite. It communicates with the backend via REST API (for admin tasks) and WebSockets (for real-time gameplay).
--   **Backend:** A Node.js web service using Express and TypeScript. It manages game state and user data.
+-   **Backend:** A Node.js web service using Express and TypeScript. It manages game state and user data. It authenticates users by validating `initData` from the Telegram Web App.
 -   **Database:** PostgreSQL, accessed directly using the `pg` library. The application automatically initializes the required tables on first startup.
 
 ## Deployment on Render
@@ -41,6 +41,7 @@ This project requires deploying two separate services on [Render](https://render
 
     | Key            | Description                                                                                             | Example Value                                  |
     | :------------- | :------------------------------------------------------------------------------------------------------ | :--------------------------------------------- |
+    | `BOT_TOKEN`      | **Required.** Your Telegram bot token from `@BotFather`. Used to authenticate players.                  | `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`     |
     | `DATABASE_URL` | The **Internal Database URL** you copied from your PostgreSQL service.                                  | `postgres://user:password@host:port/database`  |
     | `FRONTEND_URL` | The public URL of your frontend static site (you'll create this in the next section).                     | `https://crypto-poker-club.onrender.com`       |
     
