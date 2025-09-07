@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { AdminUser } from '../types';
+import { AdminUser, Rank, Suit, SlotSymbol } from '../types';
 import { AssetContext } from '../contexts/AssetContext';
 import { ExitIcon } from './Icons';
 
@@ -10,6 +10,22 @@ interface AdminPanelProps {
 
 // FIX: Cast import.meta to any to access env properties without vite/client types, resolving a TypeScript error.
 const API_URL = (import.meta as any).env.VITE_API_URL;
+
+const SUITS_ORDERED = Object.values(Suit);
+const RANKS_ORDERED = Object.values(Rank);
+
+const CollapsibleSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div className="border border-gray-700 rounded-lg">
+            <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left p-3 bg-gray-700/50 hover:bg-gray-700 flex justify-between items-center">
+                <span className="font-semibold">{title}</span>
+                <span>{isOpen ? '−' : '+'}</span>
+            </button>
+            {isOpen && <div className="p-4">{children}</div>}
+        </div>
+    )
+}
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
     const [users, setUsers] = useState<AdminUser[]>([]);
@@ -46,6 +62,44 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
     const handleAssetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalAssets({ ...localAssets, [e.target.name]: e.target.value });
     };
+
+    const handleCardFaceChange = (suit: Suit, rank: Rank, value: string) => {
+        setLocalAssets(prev => ({
+            ...prev,
+            cardFaces: {
+                ...prev.cardFaces,
+                [suit]: {
+                    ...prev.cardFaces[suit],
+                    [rank]: value,
+                }
+            }
+        }));
+    };
+
+    const handleSlotSymbolChange = (index: number, field: keyof SlotSymbol, value: string | number) => {
+        const updatedSymbols = [...localAssets.slotSymbols];
+        const symbolToUpdate = { ...updatedSymbols[index] };
+        
+        if (field === 'payout' || field === 'weight') {
+             (symbolToUpdate[field] as number) = Number(value)
+        } else {
+            (symbolToUpdate[field] as string) = String(value);
+        }
+
+        updatedSymbols[index] = symbolToUpdate;
+        setLocalAssets(prev => ({ ...prev, slotSymbols: updatedSymbols }));
+    };
+
+    const addSlotSymbol = () => {
+        const newSymbol: SlotSymbol = { name: 'New Symbol', imageUrl: '', payout: 10, weight: 1 };
+        setLocalAssets(prev => ({...prev, slotSymbols: [...prev.slotSymbols, newSymbol]}));
+    }
+
+    const removeSlotSymbol = (index: number) => {
+        const updatedSymbols = localAssets.slotSymbols.filter((_, i) => i !== index);
+        setLocalAssets(prev => ({...prev, slotSymbols: updatedSymbols}));
+    }
+
 
     const saveAssets = async () => {
         try {
@@ -197,25 +251,87 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
 
                 {/* Asset Customization */}
                 <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-                    <h2 className="text-2xl font-bold mb-4 text-white">Asset Customization</h2>
-                    <p className="text-sm text-gray-400 mb-6">Change the visual assets used in the game. Use `{'{rank}'}` and `{'{suit}'}` placeholders for card faces.</p>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Card Back URL</label>
-                            <input type="text" name="cardBackUrl" value={localAssets.cardBackUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Card Face URL Pattern</label>
-                            <input type="text" name="cardFaceUrlPattern" value={localAssets.cardFaceUrlPattern} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">Table Background URL</label>
-                            <input type="text" name="tableBackgroundUrl" value={localAssets.tableBackgroundUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-white">Asset Customization</h2>
+                        <div className="flex space-x-4">
+                            <button onClick={saveAssets} className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-md">Save All Changes</button>
+                            <button onClick={resetAssets} className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 rounded-md">Reset to Default</button>
                         </div>
                     </div>
-                    <div className="flex space-x-4 mt-6">
-                        <button onClick={saveAssets} className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-md">Save Changes</button>
-                        <button onClick={resetAssets} className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 rounded-md">Reset to Default</button>
+                    
+                    <div className="space-y-6">
+                        {/* General Assets */}
+                        <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2">General</h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Card Back URL</label>
+                                <input type="text" name="cardBackUrl" value={localAssets.cardBackUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Table Background URL</label>
+                                <input type="text" name="tableBackgroundUrl" value={localAssets.tableBackgroundUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                            </div>
+                        </div>
+
+                        {/* Card Faces */}
+                        <div>
+                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Card Faces</h3>
+                            <div className="space-y-2">
+                            {SUITS_ORDERED.map(suit => (
+                                <CollapsibleSection key={suit} title={suit.charAt(0) + suit.slice(1).toLowerCase()}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {RANKS_ORDERED.map(rank => (
+                                            <div key={rank}>
+                                                <label className="block text-xs font-medium text-gray-400 mb-1">Rank {rank}</label>
+                                                <input
+                                                    type="text"
+                                                    value={localAssets.cardFaces[suit]?.[rank] || ''}
+                                                    onChange={e => handleCardFaceChange(suit, rank, e.target.value)}
+                                                    className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CollapsibleSection>
+                            ))}
+                            </div>
+                        </div>
+
+                        {/* Slot Symbols */}
+                        <div>
+                             <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Slot Machine Symbols</h3>
+                             <div className="space-y-4">
+                                {localAssets.slotSymbols.map((symbol, index) => (
+                                    <div key={index} className="grid grid-cols-12 gap-3 items-center bg-gray-900/50 p-3 rounded-lg">
+                                        <div className="col-span-3">
+                                            <label className="text-xs text-gray-400">Name</label>
+                                            <input type="text" value={symbol.name} onChange={e => handleSlotSymbolChange(index, 'name', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
+                                        </div>
+                                         <div className="col-span-5">
+                                            <label className="text-xs text-gray-400">Image URL</label>
+                                            <input type="text" value={symbol.imageUrl} onChange={e => handleSlotSymbolChange(index, 'imageUrl', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
+                                        </div>
+                                         <div className="col-span-1">
+                                            <label className="text-xs text-gray-400">Payout</label>
+                                            <input type="number" value={symbol.payout} onChange={e => handleSlotSymbolChange(index, 'payout', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
+                                        </div>
+                                        <div className="col-span-1">
+                                            <label className="text-xs text-gray-400">Weight</label>
+                                            <input type="number" value={symbol.weight} onChange={e => handleSlotSymbolChange(index, 'weight', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
+                                        </div>
+                                        <div className="col-span-2 flex justify-end">
+                                            <button onClick={() => removeSlotSymbol(index)} className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded-md text-sm mt-4">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                             </div>
+                             <button onClick={addSlotSymbol} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md text-sm">
+                                Add New Symbol
+                             </button>
+                        </div>
+
                     </div>
                 </div>
                 </>

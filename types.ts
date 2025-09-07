@@ -1,3 +1,5 @@
+
+
 export enum Suit {
   HEARTS = 'HEARTS',
   DIAMONDS = 'DIAMONDS',
@@ -114,4 +116,13 @@ export interface AdminUser {
     playMoney: number;
     realMoney: number;
     role: 'ADMIN' | 'MODERATOR' | 'PLAYER' | string;
+}
+
+// For Slots game
+export interface SlotSymbol {
+  id?: number; // Optional for new symbols on the frontend
+  name: string;
+  imageUrl: string;
+  payout: number;
+  weight: number;
 }

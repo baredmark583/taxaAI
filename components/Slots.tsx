@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { GameMode } from '../types';
 import { ExitIcon } from './Icons';
+import { AssetContext } from '../contexts/AssetContext';
 
 interface SlotsProps {
   onExit: () => void;
@@ -10,23 +11,7 @@ interface SlotsProps {
   setPlayMoneyBalance: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const symbols = [
-    { id: 'SEVEN', imageUrl: 'https://www.svgrepo.com/show/19161/seven.svg', payout: 100 },
-    { id: 'BAR', imageUrl: 'https://www.svgrepo.com/show/210397/maps-and-flags-casino.svg', payout: 50 },
-    { id: 'BELL', imageUrl: 'https://www.svgrepo.com/show/19163/bell.svg', payout: 20 },
-    { id: 'CHERRY', imageUrl: 'https://www.svgrepo.com/show/198816/slot-machine-casino.svg', payout: 10 },
-];
-
-// Adjusting probabilities: Cherries are most common, sevens are rarest.
-const allReelSymbols = [
-    symbols[0], // Seven
-    symbols[1], symbols[1], // BAR
-    symbols[2], symbols[2], symbols[2], // Bell
-    symbols[3], symbols[3], symbols[3], symbols[3], // Cherry
-];
-
-
-const Reel: React.FC<{ symbol: typeof symbols[0], spinning: boolean }> = ({ symbol, spinning }) => {
+const Reel: React.FC<{ symbol: any, spinning: boolean, allReelSymbols: any[] }> = ({ symbol, spinning, allReelSymbols }) => {
     const [displaySymbol, setDisplaySymbol] = useState(symbol);
 
     useEffect(() => {
@@ -38,17 +23,20 @@ const Reel: React.FC<{ symbol: typeof symbols[0], spinning: boolean }> = ({ symb
         } else {
             setDisplaySymbol(symbol);
         }
-    }, [spinning, symbol]);
+    }, [spinning, symbol, allReelSymbols]);
 
     return (
         <div className="w-24 h-32 md:w-32 md:h-40 bg-gray-700 rounded-lg flex items-center justify-center shadow-inner overflow-hidden p-4">
-            <img src={displaySymbol.imageUrl} alt={displaySymbol.id} className="w-full h-full object-contain" />
+            <img src={displaySymbol.imageUrl} alt={displaySymbol.name} className="w-full h-full object-contain" />
         </div>
     );
 };
 
 
 const Slots: React.FC<SlotsProps> = ({ onExit, realMoneyBalance, playMoneyBalance, setRealMoneyBalance, setPlayMoneyBalance }) => {
+    const { assets } = useContext(AssetContext);
+    const { slotSymbols } = assets;
+
     const [mode, setMode] = useState<GameMode>(GameMode.PLAY_MONEY);
     
     const balance = mode === GameMode.PLAY_MONEY ? playMoneyBalance : realMoneyBalance;
@@ -58,18 +46,33 @@ const Slots: React.FC<SlotsProps> = ({ onExit, realMoneyBalance, playMoneyBalanc
     
     const betAmounts = mode === GameMode.PLAY_MONEY ? [10, 50, 100, 500] : [0.001, 0.005, 0.01, 0.02];
     
-    const [reels, setReels] = useState([symbols[0], symbols[1], symbols[2]]);
+    const [reels, setReels] = useState(() => slotSymbols.length >= 3 ? [slotSymbols[0], slotSymbols[1], slotSymbols[2]] : [slotSymbols[0], slotSymbols[0], slotSymbols[0]]);
     const [spinning, setSpinning] = useState(false);
     const [betAmount, setBetAmount] = useState(betAmounts[0]);
     const [message, setMessage] = useState('');
 
+    // Create a weighted array of symbols for spinning the reels
+    const allReelSymbols = React.useMemo(() => {
+        if (!slotSymbols || slotSymbols.length === 0) return [];
+        return slotSymbols.flatMap(symbol => Array(symbol.weight || 1).fill(symbol));
+    }, [slotSymbols]);
+    
+
     useEffect(() => {
         setBetAmount(betAmounts[0]);
     }, [mode]);
+    
+    useEffect(() => {
+        // Set initial reels if symbols load after component mount
+        if (reels.every(r => r === undefined) && slotSymbols.length > 0) {
+             setReels(slotSymbols.length >= 3 ? [slotSymbols[0], slotSymbols[1], slotSymbols[2]] : [slotSymbols[0], slotSymbols[0], slotSymbols[0]]);
+        }
+    }, [slotSymbols, reels]);
 
     const handleSpin = () => {
-        if (spinning || balance < betAmount) {
+        if (spinning || balance < betAmount || allReelSymbols.length === 0) {
             if (balance < betAmount) setMessage("Not enough funds!");
+            if (allReelSymbols.length === 0) setMessage("No symbols configured!");
             return;
         }
         
@@ -86,7 +89,8 @@ const Slots: React.FC<SlotsProps> = ({ onExit, realMoneyBalance, playMoneyBalanc
             setReels(newReels);
 
             let winAmount = 0;
-            if (newReels[0].id === newReels[1].id && newReels[1].id === newReels[2].id) {
+            // Payouts are based on the symbol's name (or a unique ID)
+            if (newReels[0].name === newReels[1].name && newReels[1].name === newReels[2].name) {
                 winAmount = betAmount * newReels[0].payout;
             }
             
@@ -112,7 +116,7 @@ const Slots: React.FC<SlotsProps> = ({ onExit, realMoneyBalance, playMoneyBalanc
 
             <div className="flex flex-col items-center justify-center bg-gray-800 p-6 rounded-2xl shadow-lg border-2 border-purple-800 w-full max-w-md md:max-w-xl">
                 <div className="flex space-x-2 md:space-x-4 mb-6 bg-gray-900 p-4 rounded-lg shadow-lg">
-                    {reels.map((symbol, i) => <Reel key={i} symbol={symbol} spinning={spinning} /> )}
+                    {reels.map((symbol, i) => <Reel key={i} symbol={symbol} spinning={spinning} allReelSymbols={allReelSymbols} /> )}
                 </div>
 
                 <div className="h-8 text-yellow-400 text-lg font-bold mb-4 animate-pulse">{message}</div>
