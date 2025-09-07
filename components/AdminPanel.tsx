@@ -102,6 +102,26 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit }) => {
         }
     };
 
+    const handleRoleChange = async (userId: string, newRole: string) => {
+        try {
+            const response = await fetch(`${API_URL}/api/users/${userId}/role`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole }),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to update role');
+            }
+            const updatedUser = await response.json();
+            setUsers(users.map(u => u.id === userId ? updatedUser : u));
+            alert(`User ${updatedUser.name}'s role updated to ${newRole}.`);
+        } catch (error) {
+            console.error(error);
+            alert(`Error updating role: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-900 text-white p-4 font-sans">
@@ -131,19 +151,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit }) => {
                                     <th className="p-3">Player</th>
                                     <th className="p-3">Play Money</th>
                                     <th className="p-3">Real Money (ETH)</th>
+                                    <th className="p-3">Role</th>
                                     <th className="p-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
                                 {users.map(user => (
                                     <tr key={user.id} className="hover:bg-gray-700/50">
-                                        <td className="p-3 font-semibold">{user.name}</td>
+                                        <td className="p-3 font-semibold">{user.name} <span className="text-xs text-gray-400">({user.id})</span></td>
                                         <td className="p-3 font-mono">${user.playMoney.toLocaleString()}</td>
                                         <td className="p-3 font-mono">{user.realMoney.toFixed(4)}</td>
-                                        <td className="p-3 text-center">
-                                            <button onClick={() => grantReward(user.id)} className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-3 py-1 rounded-md text-sm">
-                                                Grant Reward
-                                            </button>
+                                        <td className="p-3">
+                                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                              user.role === 'ADMIN' ? 'bg-red-600 text-white' :
+                                              user.role === 'MODERATOR' ? 'bg-cyan-500 text-white' :
+                                              'bg-gray-600 text-gray-200'
+                                          }`}>
+                                              {user.role}
+                                          </span>
+                                        </td>
+                                        <td className="p-3">
+                                          <div className="flex items-center space-x-2">
+                                              <button onClick={() => grantReward(user.id)} className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1 rounded-md text-sm">
+                                                  Grant Reward
+                                              </button>
+                                              {user.role !== 'ADMIN' && (
+                                                   <select
+                                                      value={user.role}
+                                                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                      className="bg-gray-700 border border-gray-600 text-white text-sm rounded-md focus:ring-cyan-500 focus:border-cyan-500"
+                                                  >
+                                                      <option value="PLAYER">Set as Player</option>
+                                                      <option value="MODERATOR">Set as Moderator</option>
+                                                  </select>
+                                              )}
+                                          </div>
                                         </td>
                                     </tr>
                                 ))}

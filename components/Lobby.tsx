@@ -11,6 +11,7 @@ interface LobbyProps {
   realMoneyBalance: number;
   playMoneyBalance: number;
   setRealMoneyBalance: (balance: number) => void;
+  isAdmin: boolean;
 }
 
 const mockTables: TableConfig[] = [
@@ -23,7 +24,7 @@ const mockTables: TableConfig[] = [
 ];
 
 
-const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulette, onEnterAdmin, realMoneyBalance, playMoneyBalance, setRealMoneyBalance }) => {
+const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulette, onEnterAdmin, realMoneyBalance, playMoneyBalance, setRealMoneyBalance, isAdmin }) => {
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [moneyTab, setMoneyTab] = useState<GameMode>(GameMode.REAL_MONEY);
   const [gameTab, setGameTab] = useState('POKER');
@@ -140,12 +141,14 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
             >
                 Manage Crypto Wallet
             </button>
-             <button
-                onClick={onEnterAdmin}
-                className="text-gray-400 hover:text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
-            >
-                Admin Panel
-            </button>
+            {isAdmin && (
+                <button
+                    onClick={onEnterAdmin}
+                    className="text-gray-400 hover:text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
+                >
+                    Admin Panel
+                </button>
+            )}
         </div>
       
       <WalletModal 

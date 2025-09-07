@@ -16,6 +16,8 @@ interface TelegramUser {
   username?: string;
 }
 
+const ADMIN_TELEGRAM_ID = 7327258482;
+
 const AppContent: React.FC = () => {
   const [activeGame, setActiveGame] = useState<ActiveGame>('LOBBY');
   const [pokerTable, setPokerTable] = useState<TableConfig | null>(null);
@@ -39,6 +41,8 @@ const AppContent: React.FC = () => {
     }
     setIsInitializing(false);
   }, []);
+  
+  const isAdmin = telegramUser?.id === ADMIN_TELEGRAM_ID;
 
   const handleEnterPoker = useCallback((table: TableConfig) => {
     setPokerTable(table);
@@ -80,6 +84,7 @@ const AppContent: React.FC = () => {
         setIsGodMode={setIsGodMode}
         telegramUser={telegramUser}
         initData={initData}
+        isAdmin={isAdmin}
       />
     );
   }
@@ -123,6 +128,7 @@ const AppContent: React.FC = () => {
       realMoneyBalance={realMoneyBalance}
       playMoneyBalance={playMoneyBalance}
       setRealMoneyBalance={setRealMoneyBalance}
+      isAdmin={isAdmin}
     />
   );
 };

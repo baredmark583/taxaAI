@@ -23,6 +23,7 @@ interface GameTableProps {
   setIsGodMode: (active: boolean) => void;
   telegramUser: TelegramUser;
   initData: string;
+  isAdmin: boolean;
 }
 
 const positions = [
@@ -36,7 +37,7 @@ const positions = [
 ];
 
 
-const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGodMode, setIsGodMode, telegramUser, initData }) => {
+const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGodMode, setIsGodMode, telegramUser, initData, isAdmin }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { assets } = useContext(AssetContext);
   const userId = telegramUser.id.toString();
@@ -139,6 +140,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onActivateGodMode={() => setIsGodMode(true)}
+        isAdmin={isAdmin}
       />
 
     </div>
