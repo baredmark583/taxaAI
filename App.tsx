@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
 import Slots from './components/Slots';
 import Roulette from './components/Roulette';
 import AdminPanel from './components/AdminPanel';
+import AdminLogin from './components/AdminLogin';
 import { AssetProvider } from './contexts/AssetContext';
 import { GameMode, TableConfig } from './types';
 
@@ -18,11 +19,11 @@ interface TelegramUser {
 
 const ADMIN_TELEGRAM_ID = 7327258482;
 
-const AppContent: React.FC = () => {
+const TelegramFlow: FC = () => {
   const [activeGame, setActiveGame] = useState<ActiveGame>('LOBBY');
   const [pokerTable, setPokerTable] = useState<TableConfig | null>(null);
   const [isGodMode, setIsGodMode] = useState(false);
-  const [realMoneyBalance, setRealMoneyBalance] = useState(0.5); // Example: in ETH
+  const [realMoneyBalance, setRealMoneyBalance] = useState(0.5);
   const [playMoneyBalance, setPlayMoneyBalance] = useState(10000);
   
   const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
@@ -133,9 +134,46 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => (
+
+const AdminFlow: FC = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('isAdminAuthenticated') === 'true');
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('isAdminAuthenticated');
+        setIsAuthenticated(false);
+    };
+
+    if (!isAuthenticated) {
+        return <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />;
+    }
+
+    return <AdminPanel onExit={handleLogout} isBrowserView={true} />;
+};
+
+
+const AppRouter: FC = () => {
+  const [pathname, setPathname] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const onLocationChange = () => {
+      setPathname(window.location.pathname);
+    };
+    // Listen for browser navigation events
+    window.addEventListener('popstate', onLocationChange);
+    return () => window.removeEventListener('popstate', onLocationChange);
+  }, []);
+  
+  if (pathname.toLowerCase().startsWith('/admin')) {
+    return <AdminFlow />;
+  }
+  
+  return <TelegramFlow />;
+}
+
+
+const App: FC = () => (
   <AssetProvider>
-    <AppContent />
+    <AppRouter />
   </AssetProvider>
 );
 

@@ -5,12 +5,13 @@ import { ExitIcon } from './Icons';
 
 interface AdminPanelProps {
   onExit: () => void;
+  isBrowserView?: boolean;
 }
 
 // FIX: Cast import.meta to any to access env properties without vite/client types, resolving a TypeScript error.
 const API_URL = (import.meta as any).env.VITE_API_URL;
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ onExit }) => {
+const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
     const [users, setUsers] = useState<AdminUser[]>([]);
     const { assets, setAssets } = useContext(AssetContext);
     const [localAssets, setLocalAssets] = useState(assets);
@@ -128,7 +129,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit }) => {
             <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gray-900/50 z-20">
                 <button onClick={onExit} className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
                     <ExitIcon className="w-6 h-6" />
-                    <span>Lobby</span>
+                    <span>{isBrowserView ? 'Logout' : 'Lobby'}</span>
                 </button>
                 <h1 className="text-xl font-bold text-cyan-400">Admin Panel</h1>
                 <div className="w-24"></div>

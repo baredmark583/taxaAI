@@ -44,6 +44,7 @@ This project requires deploying two separate services on [Render](https://render
     | `BOT_TOKEN`      | **Required.** Your Telegram bot token from `@BotFather`. Used to authenticate players.                  | `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`     |
     | `DATABASE_URL` | The **Internal Database URL** you copied from your PostgreSQL service.                                  | `postgres://user:password@host:port/database`  |
     | `FRONTEND_URL` | The public URL of your frontend static site (you'll create this in the next section).                     | `https://crypto-poker-club.onrender.com`       |
+    | `ADMIN_PASSWORD` | **Optional.** A password to access the admin panel directly from a browser (`/admin` URL), bypassing Telegram. | `supersecret_poker_password`                   |
     
 6.  **Deploy:**
     *   Click "Create Web Service". Render will build and deploy your backend. Note the URL it gets (e.g., `https://poker-backend.onrender.com`).
