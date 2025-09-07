@@ -152,21 +152,26 @@ const AdminFlow: FC = () => {
 
 
 const AppRouter: FC = () => {
-  const [pathname, setPathname] = useState(window.location.pathname);
+  // Get the hash part of the URL (e.g., '#/admin') and remove the leading '#'
+  const getRoute = () => window.location.hash.substring(1);
+  const [route, setRoute] = useState(getRoute());
 
   useEffect(() => {
-    const onLocationChange = () => {
-      setPathname(window.location.pathname);
+    const onHashChange = () => {
+      setRoute(getRoute());
     };
-    // Listen for browser navigation events
-    window.addEventListener('popstate', onLocationChange);
-    return () => window.removeEventListener('popstate', onLocationChange);
+    
+    // Listen for hash changes (e.g., clicking links, browser back/forward)
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
   
-  if (pathname.toLowerCase().startsWith('/admin')) {
+  // Check if the route starts with '/admin'
+  if (route.toLowerCase().startsWith('/admin')) {
     return <AdminFlow />;
   }
   
+  // Default to the main Telegram app flow
   return <TelegramFlow />;
 }
 
