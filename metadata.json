@@ -1,0 +1,5 @@
+{
+  "name": "Crypto Poker Club",
+  "description": "A multiplayer Texas Hold'em poker game designed as a Telegram Web App. This prototype includes game tables, slots, roulette, and an admin panel for managing players and customizing game assets.",
+  "requestFramePermissions": []
+}

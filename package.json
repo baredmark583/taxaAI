@@ -1,0 +1,25 @@
+{
+  "name": "crypto-poker-club",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react-dom": "^19.1.1",
+    "react": "^19.1.1",
+    "@prisma/client": "^6.15.0",
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "ws": "^8.18.3",
+    "http": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
