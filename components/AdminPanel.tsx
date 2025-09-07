@@ -1,6 +1,3 @@
-// FIX: Add a reference to Vite client types to inform TypeScript about `import.meta.env`.
-/// <reference types="vite/client" />
-
 import React, { useState, useContext, useEffect } from 'react';
 import { AdminUser } from '../types';
 import { AssetContext } from '../contexts/AssetContext';
@@ -10,7 +7,8 @@ interface AdminPanelProps {
   onExit: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL;
+// FIX: Cast import.meta to any to access env properties without vite/client types, resolving a TypeScript error.
+const API_URL = (import.meta as any).env.VITE_API_URL;
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ onExit }) => {
     const [users, setUsers] = useState<AdminUser[]>([]);

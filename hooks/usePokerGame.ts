@@ -1,12 +1,10 @@
-// FIX: Add a reference to Vite client types to inform TypeScript about `import.meta.env`.
-/// <reference types="vite/client" />
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { GameState, PlayerAction } from '../types';
 
 // The backend URLs are now injected via environment variables
-const API_URL = import.meta.env.VITE_API_URL;
-const WS_URL = import.meta.env.VITE_WS_URL;
+// FIX: Cast import.meta to any to access env properties without vite/client types, resolving a TypeScript error.
+const API_URL = (import.meta as any).env.VITE_API_URL;
+const WS_URL = (import.meta as any).env.VITE_WS_URL;
 
 const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: number, bigBlind: number) => {
   const [state, setState] = useState<GameState | null>(null);

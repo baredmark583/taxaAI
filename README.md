@@ -5,26 +5,24 @@ This is a full-stack multiplayer Texas Hold'em poker game designed to run as a T
 ## Architecture
 
 -   **Frontend:** A static site built with React and Vite. It communicates with the backend via REST API (for admin tasks) and WebSockets (for real-time gameplay).
--   **Backend:** A Node.js web service using Express, TypeScript, and Prisma ORM for database interaction. It manages game state, user data, and serves API requests.
--   **Database:** PostgreSQL for persistent storage of user data and application settings.
+-   **Backend:** A Node.js web service using Express and TypeScript. It manages game state and user data.
+-   **Database:** PostgreSQL, accessed directly using the `pg` library. The application automatically initializes the required tables on first startup.
 
 ## Deployment on Render
 
-This project requires deploying two separate services on [Render](https://render.com/): a **Static Site** for the frontend and a **Web Service** for the backend.
+This project requires deploying two separate services on [Render](https://render.com/): a **Static Site** for the frontend and a **Web Service** for the backend, connected to a **PostgreSQL Database**.
 
 ---
 
-### 1. Backend Deployment (Web Service)
-
-First, set up the backend service.
+### 1. Backend Deployment (Web Service + PostgreSQL)
 
 1.  **Fork this Repository:**
     Create a fork of this repository in your own GitHub account.
 
-2.  **Create a PostgreSQL Database:**
-    *   On Render, go to "New" -> "PostgreSQL".
-    *   Give it a name and choose a region.
-    *   After it's created, keep the "Internal Connection String" handy. You will use it soon.
+2.  **Create a PostgreSQL Database on Render:**
+    *   Click "New +" -> "PostgreSQL".
+    *   Give it a name and choose a plan. The free plan is sufficient for development.
+    *   After creation, find the "Connections" section and copy the **"Internal Database URL"**. You will need this soon.
 
 3.  **Create a New "Web Service" on Render:**
     *   Click "New +" -> "Web Service".
@@ -34,26 +32,24 @@ First, set up the backend service.
     *   **Name:** Give your service a name (e.g., `poker-backend`).
     *   **Root Directory:** `backend` (This tells Render to look inside the `backend` folder).
     *   **Runtime:** `Node`.
-    *   **Build Command:** `npm install && npx prisma generate && npm run build`
+    *   **Build Command:** `npm install && npm run build`
     *   **Start Command:** `npm start`
 
 5.  **Add Environment Variables:**
     *   Go to the "Environment" tab for your new web service.
-    *   Click "Add Environment Variable" for each variable.
+    *   Click "Add Environment Variable" for each of the following:
 
     | Key            | Description                                                                                             | Example Value                                  |
     | :------------- | :------------------------------------------------------------------------------------------------------ | :--------------------------------------------- |
-    | `DATABASE_URL` | The **internal connection string** from the PostgreSQL database you created on Render.                  | `postgres://user:pass@host/db_name`          |
+    | `DATABASE_URL` | The **Internal Database URL** you copied from your PostgreSQL service.                                  | `postgres://user:password@host:port/database`  |
     | `FRONTEND_URL` | The public URL of your frontend static site (you'll create this in the next section).                     | `https://crypto-poker-club.onrender.com`       |
-
+    
 6.  **Deploy:**
     *   Click "Create Web Service". Render will build and deploy your backend. Note the URL it gets (e.g., `https://poker-backend.onrender.com`).
 
 ---
 
 ### 2. Frontend Deployment (Static Site)
-
-Now, deploy the user-facing part of the application.
 
 1.  **Create a New "Static Site" on Render:**
     *   Click "New +" -> "Static Site".
