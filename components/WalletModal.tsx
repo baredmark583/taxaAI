@@ -33,16 +33,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
     }
 
     try {
-        // FIX: The API expects payment details ONLY nested within a 'data' object.
-        // The redundant top-level properties have been removed.
+        // NEW HYPOTHESIS: The API expects a flat JSON body with payment details
+        // at the top level, not nested within a 'data' field. This is a more
+        // standard REST API design and is a likely fix for the 400 error.
         const body = {
             web_view_init_data_raw: TWebApp.initData,
             ep: "attach+direct",
-            data: {
-                receiver: ADMIN_TELEGRAM_USERNAME,
-                amount: numericAmount.toString(),
-                asset: "TON",
-            }
+            receiver: ADMIN_TELEGRAM_USERNAME,
+            amount: numericAmount,
+            asset: "TON",
         };
 
         const response = await fetch("https://walletbot.me/api/v1/users/auth/", {
