@@ -221,8 +221,8 @@ const App: FC = () => {
   return (
     <TonConnectUIProvider 
         manifestUrl={manifestUrl}
-        // FIX: The prop 'walletsListSource' does not exist on TonConnectUIProviderProps. Changed to 'walletsList'.
-        walletsList={wallets} // Provide the filtered list to the UI provider
+        // FIX: The prop 'walletsList' does not exist on TonConnectUIProviderProps. Changed to 'walletsListSource' to match the expected prop name for this library version.
+        walletsListSource={wallets} // Provide the filtered list to the UI provider
     >
         <AssetProvider>
             <AppRouter />

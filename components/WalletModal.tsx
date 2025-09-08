@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { useTonConnectUI, useTonWallet, TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 
 // This is the club's treasury wallet address where deposits will be sent.
-// IMPORTANT: Replace with a real wallet address for a live application.
-const TREASURY_WALLET_ADDRESS = "UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABADR-L";
+// IMPORTANT: Replace this with your own REAL wallet address for a live application.
+// This is a sample TESTNET address. Do not send real TON to it.
+const TREASURY_WALLET_ADDRESS = "UQARnCdfRw0VcT86ApqHJEdMGzQU3T_MnPbNs71A6nOXcF91";
 
 interface WalletModalProps {
   isOpen: boolean;
