@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
-// This is a placeholder for your project's wallet address in the TON network.
-// In a real application, this would come from a secure configuration.
-const YOUR_PROJECT_WALLET_ADDRESS = "UQBF9gBv23d_9u_G-P6z_4J-x_9qZ_cE-r_tO-y_jHP"; // Example address
+// The administrator's Telegram username. Users will be sent here to complete the deposit.
+const ADMIN_TELEGRAM_USERNAME = "nysha667"; 
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -11,123 +10,128 @@ interface WalletModalProps {
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalance }) => {
-  const [step, setStep] = useState<'input' | 'confirm'>('input');
   const [amount, setAmount] = useState('10');
-  const [paymentUrl, setPaymentUrl] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleCreateInvoice = () => {
+  const handleDeposit = async () => {
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount) || numericAmount <= 0) {
-      setError('Please enter a valid positive amount.');
+      setError('Пожалуйста, введите корректную сумму.');
       return;
     }
     setError('');
+    setIsLoading(true);
 
-    // Generate a unique comment for tracking the payment on the backend.
-    const comment = `deposit_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const TWebApp = (window as any).Telegram?.WebApp;
+    if (!TWebApp || !TWebApp.initData) {
+        setError('Контекст Telegram WebApp недоступен.');
+        setIsLoading(false);
+        return;
+    }
 
-    // This is the deep link format for Telegram's @Wallet.
-    const url = `https://t.me/wallet/transfer?address=${YOUR_PROJECT_WALLET_ADDRESS}&amount=${numericAmount}&comment=${comment}`;
-    
-    setPaymentUrl(url);
-    setStep('confirm');
-  };
+    try {
+        const body = {
+            web_view_init_data_raw: TWebApp.initData,
+            ep: "attach+direct", // The newly discovered direct method
+            receiver: ADMIN_TELEGRAM_USERNAME,
+            amount: numericAmount.toString(),
+            asset: "TON", // The primary asset for this app
+        };
 
-  const handlePay = () => {
-    if (paymentUrl) {
-      (window as any).Telegram?.WebApp?.openTelegramLink(paymentUrl);
-      // We close the modal as the user is now interacting with Telegram Wallet
-      onClose();
+        const response = await fetch("https://walletbot.me/api/v1/users/auth/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Не удалось инициализировать платеж через API кошелька.');
+        }
+        
+        const result = await response.json();
+        
+        // Based on community findings, the response should contain a deep link to open.
+        // The exact structure might vary, so we check for common patterns.
+        const paymentUrl = result?.data?.url || result?.url;
+
+        if (paymentUrl && typeof paymentUrl === 'string') {
+            TWebApp.openTelegramLink(paymentUrl);
+            onClose(); // Close modal on success
+        } else {
+            console.error('Ответ API кошелька не содержит валидный URL для оплаты.', result);
+            throw new Error('Получен неверный ответ от сервиса кошелька.');
+        }
+
+    } catch (err: any) {
+        console.error('Ошибка инициализации платежа в кошельке:', err);
+        setError(err.message || 'Произошла непредвиденная ошибка. Пожалуйста, попробуйте снова.');
+    } finally {
+        setIsLoading(false);
     }
   };
   
-  const reset = () => {
-    setStep('input');
+  const resetAndClose = () => {
     setAmount('10');
-    setPaymentUrl('');
     setError('');
-  }
-
-  const handleClose = () => {
-    reset();
+    setIsLoading(false);
     onClose();
   }
   
-  const renderInputStep = () => (
-    <>
-      <h3 className="text-lg font-semibold mb-2 text-white">Deposit TON</h3>
-      <p className="text-sm text-gray-400 mb-4">Enter the amount of TON you wish to deposit into your account.</p>
-      <div className="mb-4">
-        <label htmlFor="deposit-amount" className="block text-sm font-medium text-gray-300 mb-2">
-          Amount (TON)
-        </label>
-        <div className="relative">
-          <input
-            type="number"
-            id="deposit-amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="e.g., 10"
-            className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">TON</span>
-        </div>
-        {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-      </div>
-      <button 
-        onClick={handleCreateInvoice} 
-        className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg transition-colors"
-      >
-        Create Invoice
-      </button>
-    </>
-  );
-
-  const renderConfirmStep = () => (
-    <>
-       <h3 className="text-lg font-semibold mb-2 text-white">Confirm Deposit</h3>
-       <p className="text-sm text-gray-400 mb-4">
-         You are about to deposit <span className="font-bold text-cyan-400">{amount} TON</span>. 
-         Click the button below to complete the payment using your Telegram Wallet.
-       </p>
-       <div className="bg-gray-900 p-4 rounded-lg my-6 text-center">
-            <p className="text-gray-300">Your balance will be updated automatically after the transaction is confirmed.</p>
-       </div>
-       <div className="space-y-3">
-            <button 
-              onClick={handlePay} 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
-            >
-              Pay with Telegram Wallet
-            </button>
-             <button 
-              onClick={reset} 
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg transition-colors text-sm"
-            >
-              Cancel
-            </button>
-       </div>
-    </>
-  );
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700 transform transition-all duration-300 scale-100 animate-fade-in">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">Crypto Wallet</h2>
-            <button onClick={handleClose} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            <h2 className="text-2xl font-bold text-white">Пополнение через Wallet</h2>
+            <button onClick={resetAndClose} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
           </div>
           <div className="bg-gray-900 p-4 rounded-lg mb-6">
-            <p className="text-sm text-gray-400">Current Balance</p>
+            <p className="text-sm text-gray-400">Текущий баланс</p>
             <p className="text-3xl font-mono text-cyan-400">{currentBalance.toFixed(4)} TON</p>
           </div>
 
-          {step === 'input' ? renderInputStep() : renderConfirmStep()}
-          
+          <div>
+            <p className="text-sm text-gray-400 mb-4">
+              Введите сумму в TON для пополнения. Вам будет предложено подтвердить транзакцию в вашем кошельке Telegram.
+            </p>
+            <div className="mb-4">
+              <label htmlFor="deposit-amount" className="block text-sm font-medium text-gray-300 mb-2">
+                Сумма (TON)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  id="deposit-amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="e.g., 10"
+                  className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  disabled={isLoading}
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">TON</span>
+              </div>
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            </div>
+            <button 
+              onClick={handleDeposit} 
+              disabled={isLoading}
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Инициализация...
+                </>
+              ) : 'Перейти к оплате'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
