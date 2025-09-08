@@ -176,7 +176,7 @@ const AppRouter: FC = () => {
   return <TelegramFlow />;
 }
 
-// TON Connect manifest definition. This describes our app to the wallet.
+// TON Connect manifest definition.
 const tonConnectManifest = {
     url: 'https://crypto-poker.netlify.app', // A placeholder URL
     name: 'Crypto Poker Club',
@@ -185,12 +185,13 @@ const tonConnectManifest = {
 
 
 const App: FC = () => {
-  // The TonConnectUIProvider must wrap the entire app that needs wallet access.
-  // In v3, we pass the manifest object directly to the 'manifest' prop.
-  
+  // To avoid creating a static manifest.json, we can create a data URL.
+  // This is compatible with the `manifestUrl` prop in @tonconnect/ui-react v2.
+  const manifestUrl = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(tonConnectManifest))}`;
+
   return (
     <TonConnectUIProvider 
-        manifest={tonConnectManifest}
+        manifestUrl={manifestUrl}
     >
         <AssetProvider>
             <AppRouter />
