@@ -177,13 +177,6 @@ const AppRouter: FC = () => {
   return <TelegramFlow />;
 }
 
-// TON Connect manifest definition.
-const tonConnectManifest = {
-    url: 'https://crypto-poker.netlify.app', // A placeholder URL
-    name: 'Crypto Poker Club',
-    iconUrl: 'https://www.svgrepo.com/show/475685/poker-chip.svg' // A placeholder icon
-};
-
 // URL for the official TON Connect wallets list
 const WALLETS_LIST_URL = 'https://raw.githubusercontent.com/ton-connect/wallets-list/main/wallets.json';
 
@@ -196,10 +189,11 @@ const App: FC = () => {
     fetch(WALLETS_LIST_URL)
       .then(res => res.json())
       .then((data: any[]) => {
-        // Filter out Telegram-related wallets which can cause regional connection issues.
-        const filteredWallets = data.filter((wallet: any) => 
-            !wallet.appName.toLowerCase().includes('telegram')
-        );
+        // Exclude wallets known to be tied to Telegram's regionally-restricted services.
+        const filteredWallets = data.filter((wallet: any) => {
+            const appName = wallet.appName.toLowerCase();
+            return !['wallet', 'telegram-wallet', 'tonspace'].includes(appName);
+        });
         setWallets(filteredWallets);
       })
       .catch(err => {
@@ -208,9 +202,6 @@ const App: FC = () => {
         setWallets([]); 
       });
   }, []);
-
-  // Use a data URL for the manifest to avoid creating a static JSON file.
-  const manifestUrl = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(tonConnectManifest))}`;
 
   // Display a loading indicator while the wallets list is being fetched.
   if (!wallets) {
@@ -224,9 +215,10 @@ const App: FC = () => {
 
   return (
     <TonConnectUIProvider 
-        manifestUrl={manifestUrl}
-        // FIX: The `walletsList` prop is deprecated. Use `walletsListSource` to provide a custom list of wallets.
-        walletsListSource={{ wallets: wallets! }} // Provide the filtered list to the UI provider
+        manifestUrl="/tonconnect-manifest.json"
+        // FIX: The `walletsListSource` prop does not exist on this version of TonConnectUIProvider.
+        // Changed to `walletsList` to resolve the TypeScript error.
+        walletsList={wallets!} // Provide the filtered list to the UI provider
     >
         <AssetProvider>
             <AppRouter />
