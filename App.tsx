@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -190,8 +191,9 @@ const App: FC = () => {
       .then(res => res.json())
       .then((data: any[]) => {
         // Exclude wallets known to be tied to Telegram's regionally-restricted services.
+        // FIX: Safely access `appName` to prevent crashes on malformed wallet entries.
         const filteredWallets = data.filter((wallet: any) => {
-            const appName = wallet.appName.toLowerCase();
+            const appName = wallet?.appName?.toLowerCase() || '';
             return !['wallet', 'telegram-wallet', 'tonspace'].includes(appName);
         });
         setWallets(filteredWallets);
@@ -213,12 +215,14 @@ const App: FC = () => {
     );
   }
 
+  // FIX: Provide an absolute URL for the manifest to ensure TonConnect can always find it.
+  const manifestUrl = new URL('/tonconnect-manifest.json', window.location.origin).href;
+
   return (
     <TonConnectUIProvider 
-        manifestUrl="/tonconnect-manifest.json"
-        // FIX: The `walletsListSource` prop does not exist on this version of TonConnectUIProvider.
-        // Changed to `walletsList` to resolve the TypeScript error.
-        walletsList={wallets!} // Provide the filtered list to the UI provider
+        manifestUrl={manifestUrl}
+        // FIX: The correct prop to provide a custom wallets list is `walletsListSource`.
+        walletsListSource={wallets} // Provide the filtered list to the UI provider
     >
         <AssetProvider>
             <AppRouter />
