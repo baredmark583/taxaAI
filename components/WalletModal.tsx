@@ -33,7 +33,8 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
     }
 
     try {
-        // FIX: The API expects payment details to be nested within a 'data' object.
+        // FIX: The API expects payment details ONLY nested within a 'data' object.
+        // The redundant top-level properties have been removed.
         const body = {
             web_view_init_data_raw: TWebApp.initData,
             ep: "attach+direct",
