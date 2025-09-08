@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Player, PlayerAction } from '../types';
+import { FoldIcon, CallIcon, RaiseIcon } from './Icons';
 
 interface ActionControlsProps {
   player: Player;
@@ -41,7 +42,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
     const actualBetAmount = Math.max(minBet, Math.min(betAmount, maxBet));
 
     return (
-        <div className="w-full max-w-lg mt-4 p-2 bg-gray-800 rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
+        <div className="w-full max-w-lg mt-4 p-4 bg-black/40 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
             <input 
                 type="range" 
                 min={minBet}
@@ -49,15 +50,15 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
                 step={smallBlind}
                 value={actualBetAmount}
                 onChange={handleBetChange}
-                className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg accent-cyan-500"
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg accent-cyan-500"
             />
-            <div className="flex justify-between w-full text-xs text-gray-400 px-1 mt-1">
+            <div className="flex justify-between w-full text-xs text-gray-400 px-1 mt-1 font-mono">
                 <span>{currency}{formatCurrency(minBet)}</span>
                 <span>{currency}{formatCurrency(maxBet)}</span>
             </div>
-            <div className="flex items-center space-x-2 mt-2">
-                <button onClick={() => setIsBetting(false)} className="px-4 py-2 bg-gray-600 rounded">Cancel</button>
-                <button onClick={handleBetAction} className="px-8 py-2 bg-cyan-500 rounded text-white font-bold">
+            <div className="flex items-center space-x-4 mt-4">
+                <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold">Cancel</button>
+                <button onClick={handleBetAction} className="px-10 py-3 bg-green-600 hover:bg-green-500 rounded-lg text-white font-bold text-lg shadow-lg shadow-green-500/20">
                     Bet {currency}{formatCurrency(actualBetAmount)}
                 </button>
             </div>
@@ -66,35 +67,38 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
   }
 
   return (
-    <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center space-x-2">
+    <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center space-x-3">
       <button
         onClick={() => onAction({ type: 'fold' })}
-        className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-md transition-transform transform hover:scale-105"
+        className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg shadow-lg shadow-red-500/20 transition-transform transform hover:scale-105"
       >
-        Fold
+        <FoldIcon className="w-5 h-5 mr-2" />
+        <span>Fold</span>
       </button>
 
       {canCheck ? (
         <button
           onClick={() => onAction({ type: 'check' })}
-          className="px-8 py-4 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg shadow-md transition-transform transform hover:scale-105"
+          className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
         >
           Check
         </button>
       ) : (
         <button
           onClick={() => onAction({ type: 'call' })}
-          className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-transform transform hover:scale-105"
+          className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-transform transform hover:scale-105"
         >
-          Call {currency}{formatCurrency(toCall)}
+          <CallIcon className="w-5 h-5 mr-2" />
+          <span>Call {currency}{formatCurrency(toCall)}</span>
         </button>
       )}
 
       <button
         onClick={() => setIsBetting(true)}
-        className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-md transition-transform transform hover:scale-105"
+        className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold rounded-lg shadow-lg shadow-green-500/20 transition-transform transform hover:scale-105"
       >
-        {currentBet > 0 ? 'Raise' : 'Bet'}
+        <RaiseIcon className="w-5 h-5 mr-2" />
+        <span>{currentBet > 0 ? 'Raise' : 'Bet'}</span>
       </button>
     </div>
   );

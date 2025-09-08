@@ -41,13 +41,28 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
       </div>
       
       {/* Player info box */}
-      <div className={`relative bg-gray-800/90 border-2 rounded-lg px-3 py-1 shadow-md text-center w-32 ${isActive ? 'border-cyan-400 scale-105' : 'border-gray-600'}`}>
+      <div className={`relative bg-black/40 backdrop-blur-sm border-2 rounded-lg px-3 py-1 shadow-md text-center w-32 overflow-hidden ${isActive ? 'border-cyan-400 scale-105 shadow-cyan-500/30' : 'border-gray-600/50'}`}>
         <p className="text-white font-bold text-sm truncate">{name}</p>
         <p className={`font-mono text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
          <p className="text-yellow-400 font-semibold text-xs h-4 capitalize">
             {(showHand && handResult && handResult.rank > -1) ? handResult.name : ''}
         </p>
         { isThinking && <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div> }
+         {/* Timer Bar for active player */}
+        {isActive && !isFolded && (
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-cyan-400/50">
+                <div className="h-full bg-cyan-400 animate-timer-bar"></div>
+                 <style>{`
+                    @keyframes timer-bar {
+                        from { width: 100%; }
+                        to { width: 0%; }
+                    }
+                    .animate-timer-bar {
+                        animation: timer-bar 15s linear forwards;
+                    }
+                `}</style>
+            </div>
+        )}
       </div>
 
       {/* Bet amount */}

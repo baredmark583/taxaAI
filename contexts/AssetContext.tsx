@@ -4,18 +4,19 @@ import { Suit, Rank, SlotSymbol } from '../types';
 // Helper function to generate default card faces from a pattern
 const generateDefaultCardFaces = () => {
   const faces: { [suit in Suit]?: { [rank in Rank]?: string } } = {};
-  const pattern = 'https://cdn.jsdelivr.net/gh/hayeah/playing-cards-assets@master/svg-cards/{rank}_of_{suit}.svg';
+  // Using a cleaner, more modern set of SVG cards
+  const pattern = 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/{rank}{suit}.svg';
   
   const suitNameMap: Record<Suit, string> = {
-    [Suit.HEARTS]: 'hearts',
-    [Suit.DIAMONDS]: 'diamonds',
-    [Suit.CLUBS]: 'clubs',
-    [Suit.SPADES]: 'spades',
+    [Suit.HEARTS]: 'H',
+    [Suit.DIAMONDS]: 'D',
+    [Suit.CLUBS]: 'C',
+    [Suit.SPADES]: 'S',
   };
 
   const rankNameMap: Record<Rank, string> = {
-    [Rank.ACE]: 'ace', [Rank.KING]: 'king', [Rank.QUEEN]: 'queen', [Rank.JACK]: 'jack',
-    [Rank.TEN]: '10', [Rank.NINE]: '9', [Rank.EIGHT]: '8', [Rank.SEVEN]: '7',
+    [Rank.ACE]: 'A', [Rank.KING]: 'K', [Rank.QUEEN]: 'Q', [Rank.JACK]: 'J',
+    [Rank.TEN]: 'T', [Rank.NINE]: '9', [Rank.EIGHT]: '8', [Rank.SEVEN]: '7',
     [Rank.SIX]: '6', [Rank.FIVE]: '5', [Rank.FOUR]: '4', [Rank.THREE]: '3', [Rank.TWO]: '2',
   };
 
@@ -54,8 +55,8 @@ interface AssetContextType {
 
 // Default asset values
 const defaultAssets: GameAssets = {
-  cardBackUrl: 'https://www.svgrepo.com/show/472548/card-back.svg',
-  tableBackgroundUrl: 'https://wallpapercave.com/wp/wp1852445.jpg',
+  cardBackUrl: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg',
+  tableBackgroundUrl: 'https://img.freepik.com/premium-photo/poker-table-background_87394-8438.jpg',
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
