@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -183,15 +184,49 @@ const tonConnectManifest = {
     iconUrl: 'https://www.svgrepo.com/show/475685/poker-chip.svg' // A placeholder icon
 };
 
+// URL for the official TON Connect wallets list
+const WALLETS_LIST_URL = 'https://raw.githubusercontent.com/ton-connect/wallets-list/main/wallets.json';
 
 const App: FC = () => {
-  // To avoid creating a static manifest.json, we can create a data URL.
-  // This is compatible with the `manifestUrl` prop in @tonconnect/ui-react v2.
+  // State to hold the filtered list of wallets
+  const [wallets, setWallets] = useState<any[] | null>(null);
+
+  // Fetch and filter the wallets list on component mount
+  useEffect(() => {
+    fetch(WALLETS_LIST_URL)
+      .then(res => res.json())
+      .then((data: any[]) => {
+        // Filter out Telegram-related wallets which can cause regional connection issues.
+        const filteredWallets = data.filter((wallet: any) => 
+            !wallet.appName.toLowerCase().includes('telegram')
+        );
+        setWallets(filteredWallets);
+      })
+      .catch(err => {
+        console.error('Failed to fetch wallets list:', err);
+        // Fallback to an empty list if the fetch fails, so the app doesn't get stuck.
+        setWallets([]); 
+      });
+  }, []);
+
+  // Use a data URL for the manifest to avoid creating a static JSON file.
   const manifestUrl = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(tonConnectManifest))}`;
+
+  // Display a loading indicator while the wallets list is being fetched.
+  if (!wallets) {
+    return (
+      <div className="w-screen h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-500"></div>
+        <p className="mt-4 text-xl">Initializing Wallet Connection...</p>
+      </div>
+    );
+  }
 
   return (
     <TonConnectUIProvider 
         manifestUrl={manifestUrl}
+        // FIX: The `walletsList` prop is deprecated. Use `walletsListSource` to provide a custom list of wallets.
+        walletsListSource={{ wallets: wallets! }} // Provide the filtered list to the UI provider
     >
         <AssetProvider>
             <AppRouter />
