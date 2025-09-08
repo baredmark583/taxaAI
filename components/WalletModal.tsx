@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-
-// Tell TypeScript that the TonConnectUIReact object will exist on the window
-declare const TonConnectUIReact: any;
+import { useTonConnectUI, useTonWallet, TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 
 // This is the club's treasury wallet address where deposits will be sent.
 // IMPORTANT: Replace with a real wallet address for a live application.
@@ -14,9 +12,6 @@ interface WalletModalProps {
 }
 
 const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalance }) => {
-  // Destructure hooks and components from the global TonConnectUIReact object
-  const { useTonConnectUI, useTonWallet, TonConnectButton, useTonAddress } = TonConnectUIReact;
-
   const [amount, setAmount] = useState('10');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);

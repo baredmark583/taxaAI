@@ -7,9 +7,7 @@ import AdminPanel from './components/AdminPanel';
 import AdminLogin from './components/AdminLogin';
 import { AssetProvider } from './contexts/AssetContext';
 import { GameMode, TableConfig } from './types';
-
-// Tell TypeScript about the global TonConnectUIReact object from the CDN script
-declare const TonConnectUIReact: any;
+import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
 type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE' | 'ADMIN';
 
@@ -189,7 +187,6 @@ const tonConnectManifest = {
 const App: FC = () => {
   // The TonConnectUIProvider must wrap the entire app that needs wallet access.
   // We provide the manifest as a data URL to avoid needing a separate JSON file.
-  const { TonConnectUIProvider } = TonConnectUIReact;
   
   return (
     <TonConnectUIProvider 

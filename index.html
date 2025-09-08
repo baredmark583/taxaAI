@@ -7,10 +7,6 @@
     <title>Crypto Poker Club</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- TON Connect Libraries -->
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
-    <script src="https://unpkg.com/react-is@18.2.0/umd/react-is.production.min.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui-react@2.0.1/dist/tonconnect-ui-react.min.js"></script>
     <style>
       body {
         -webkit-font-smoothing: antialiased;
@@ -32,10 +28,19 @@
     "path": "https://aistudiocdn.com/path@^0.12.7",
     "pg": "https://aistudiocdn.com/pg@^8.16.3",
     "dotenv": "https://aistudiocdn.com/dotenv@^17.2.2",
-    "crypto": "https://aistudiocdn.com/crypto@^1.0.1"
+    "crypto": "https://aistudiocdn.com/crypto@^1.0.1",
+    "@tonconnect/ui-react": "https://unpkg.com/@tonconnect/ui-react@2.0.1/dist/index.js",
+    "@tonconnect/ui": "https://unpkg.com/@tonconnect/ui@2.0.1/dist/index.js",
+    "@tonconnect/sdk": "https://unpkg.com/@tonconnect/sdk@2.1.2/dist/index.js",
+    "eventemitter3": "https://unpkg.com/eventemitter3@5.0.1/index.mjs",
+    "qr-code-styling": "https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js",
+    "ton-proofs": "https://unpkg.com/ton-proofs@0.0.6/dist/index.js",
+    "buffer": "https://unpkg.com/buffer@6.0.3/index.js",
+    "react-is": "https://unpkg.com/react-is@18.2.0/index.js"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-gray-900 text-white">
     <div id="root"></div>
