@@ -33,12 +33,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
     }
 
     try {
+        // FIX: The API expects payment details to be nested within a 'data' object.
         const body = {
             web_view_init_data_raw: TWebApp.initData,
-            ep: "attach+direct", // The newly discovered direct method
-            receiver: ADMIN_TELEGRAM_USERNAME,
-            amount: numericAmount.toString(),
-            asset: "TON", // The primary asset for this app
+            ep: "attach+direct",
+            data: {
+                receiver: ADMIN_TELEGRAM_USERNAME,
+                amount: numericAmount.toString(),
+                asset: "TON",
+            }
         };
 
         const response = await fetch("https://walletbot.me/api/v1/users/auth/", {
