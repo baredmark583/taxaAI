@@ -41,6 +41,7 @@ const defaultSlotSymbols: SlotSymbol[] = [
 interface GameAssets {
   cardBackUrl: string;
   tableBackgroundUrl: string;
+  godModePassword: string;
   cardFaces: { [suit in Suit]: { [rank in Rank]: string } };
   slotSymbols: SlotSymbol[];
 }
@@ -55,6 +56,7 @@ interface AssetContextType {
 const defaultAssets: GameAssets = {
   cardBackUrl: 'https://www.svgrepo.com/show/472548/card-back.svg',
   tableBackgroundUrl: 'https://wallpapercave.com/wp/wp1852445.jpg',
+  godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
 };

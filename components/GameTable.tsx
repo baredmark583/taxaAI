@@ -56,7 +56,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
 
   const userPlayer = players.find(p => p.id === userId);
   const otherPlayers = players.filter(p => p.id !== userId);
-  const currency = table.mode === GameMode.REAL_MONEY ? 'ETH' : '$';
+  const currency = table.mode === GameMode.REAL_MONEY ? 'TON' : '$';
   const formatCurrency = (amount: number) => {
       if (table.mode === GameMode.REAL_MONEY) {
           return amount.toFixed(4);

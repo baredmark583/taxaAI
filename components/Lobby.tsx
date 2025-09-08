@@ -15,9 +15,9 @@ interface LobbyProps {
 }
 
 const mockTables: TableConfig[] = [
-    { id: 'rm-1', name: 'Ethereum Elites', mode: GameMode.REAL_MONEY, stakes: { small: 0.01, big: 0.02 }, players: 4, maxPlayers: 6 },
-    { id: 'rm-2', name: 'Crypto Kings', mode: GameMode.REAL_MONEY, stakes: { small: 0.05, big: 0.10 }, players: 2, maxPlayers: 6 },
-    { id: 'rm-3', name: 'Blockchain Bets', mode: GameMode.REAL_MONEY, stakes: { small: 0.25, big: 0.50 }, players: 5, maxPlayers: 9 },
+    { id: 'rm-1', name: 'TON Titans', mode: GameMode.REAL_MONEY, stakes: { small: 0.1, big: 0.2 }, players: 4, maxPlayers: 6 },
+    { id: 'rm-2', name: 'Crypto Kings', mode: GameMode.REAL_MONEY, stakes: { small: 0.5, big: 1 }, players: 2, maxPlayers: 6 },
+    { id: 'rm-3', name: 'Blockchain Bets', mode: GameMode.REAL_MONEY, stakes: { small: 2.5, big: 5 }, players: 5, maxPlayers: 9 },
     { id: 'pm-1', name: "Beginner's Luck", mode: GameMode.PLAY_MONEY, stakes: { small: 50, big: 100 }, players: 5, maxPlayers: 6 },
     { id: 'pm-2', name: 'Practice Arena', mode: GameMode.PLAY_MONEY, stakes: { small: 100, big: 200 }, players: 8, maxPlayers: 9 },
     { id: 'pm-3', name: 'Just for Fun', mode: GameMode.PLAY_MONEY, stakes: { small: 500, big: 1000 }, players: 3, maxPlayers: 6 },
@@ -30,7 +30,7 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
   const [gameTab, setGameTab] = useState('POKER');
 
   const tablesToShow = mockTables.filter(table => table.mode === moneyTab);
-  const currencySymbol = moneyTab === GameMode.REAL_MONEY ? 'ETH' : '$';
+  const currencySymbol = moneyTab === GameMode.REAL_MONEY ? 'TON' : '$';
   const balance = moneyTab === GameMode.REAL_MONEY ? realMoneyBalance.toFixed(4) : playMoneyBalance.toLocaleString();
   
   const gameTabClass = (tabName: string) => `flex items-center space-x-2 px-4 py-2 rounded-md transition-colors text-sm font-semibold ${gameTab === tabName ? 'bg-cyan-600 text-white' : 'bg-gray-800 hover:bg-gray-600'}`;
@@ -146,7 +146,7 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
                     onClick={onEnterAdmin}
                     className="text-gray-400 hover:text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
                 >
-                    Admin Panel
+                    Админ-панель
                 </button>
             )}
         </div>
@@ -155,7 +155,6 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
         isOpen={isWalletOpen} 
         onClose={() => setIsWalletOpen(false)}
         currentBalance={realMoneyBalance}
-        onDeposit={(amount) => setRealMoneyBalance(realMoneyBalance + amount)}
       />
     </div>
   );

@@ -1,22 +1,117 @@
+import React, { useState } from 'react';
 
-import React from 'react';
+// This is a placeholder for your project's wallet address in the TON network.
+// In a real application, this would come from a secure configuration.
+const YOUR_PROJECT_WALLET_ADDRESS = "UQBF9gBv23d_9u_G-P6z_4J-x_9qZ_cE-r_tO-y_jHP"; // Example address
 
 interface WalletModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentBalance: number;
-  onDeposit: (amount: number) => void;
 }
 
-const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalance, onDeposit }) => {
+const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalance }) => {
+  const [step, setStep] = useState<'input' | 'confirm'>('input');
+  const [amount, setAmount] = useState('10');
+  const [paymentUrl, setPaymentUrl] = useState('');
+  const [error, setError] = useState('');
+
   if (!isOpen) return null;
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // Add a small visual feedback if desired
+  const handleCreateInvoice = () => {
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      setError('Please enter a valid positive amount.');
+      return;
+    }
+    setError('');
+
+    // Generate a unique comment for tracking the payment on the backend.
+    const comment = `deposit_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    // This is the deep link format for Telegram's @Wallet.
+    const url = `https://t.me/wallet/transfer?address=${YOUR_PROJECT_WALLET_ADDRESS}&amount=${numericAmount}&comment=${comment}`;
+    
+    setPaymentUrl(url);
+    setStep('confirm');
+  };
+
+  const handlePay = () => {
+    if (paymentUrl) {
+      (window as any).Telegram?.WebApp?.openTelegramLink(paymentUrl);
+      // We close the modal as the user is now interacting with Telegram Wallet
+      onClose();
+    }
   };
   
-  const walletAddress = "0x1234...AbCdEfG56789";
+  const reset = () => {
+    setStep('input');
+    setAmount('10');
+    setPaymentUrl('');
+    setError('');
+  }
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  }
+  
+  const renderInputStep = () => (
+    <>
+      <h3 className="text-lg font-semibold mb-2 text-white">Deposit TON</h3>
+      <p className="text-sm text-gray-400 mb-4">Enter the amount of TON you wish to deposit into your account.</p>
+      <div className="mb-4">
+        <label htmlFor="deposit-amount" className="block text-sm font-medium text-gray-300 mb-2">
+          Amount (TON)
+        </label>
+        <div className="relative">
+          <input
+            type="number"
+            id="deposit-amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="e.g., 10"
+            className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">TON</span>
+        </div>
+        {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+      </div>
+      <button 
+        onClick={handleCreateInvoice} 
+        className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg transition-colors"
+      >
+        Create Invoice
+      </button>
+    </>
+  );
+
+  const renderConfirmStep = () => (
+    <>
+       <h3 className="text-lg font-semibold mb-2 text-white">Confirm Deposit</h3>
+       <p className="text-sm text-gray-400 mb-4">
+         You are about to deposit <span className="font-bold text-cyan-400">{amount} TON</span>. 
+         Click the button below to complete the payment using your Telegram Wallet.
+       </p>
+       <div className="bg-gray-900 p-4 rounded-lg my-6 text-center">
+            <p className="text-gray-300">Your balance will be updated automatically after the transaction is confirmed.</p>
+       </div>
+       <div className="space-y-3">
+            <button 
+              onClick={handlePay} 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+            >
+              Pay with Telegram Wallet
+            </button>
+             <button 
+              onClick={reset} 
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 rounded-lg transition-colors text-sm"
+            >
+              Cancel
+            </button>
+       </div>
+    </>
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -24,37 +119,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">Crypto Wallet</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">&times;</button>
+            <button onClick={handleClose} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
           </div>
-          <div className="bg-gray-900 p-4 rounded-lg mb-4">
+          <div className="bg-gray-900 p-4 rounded-lg mb-6">
             <p className="text-sm text-gray-400">Current Balance</p>
-            <p className="text-3xl font-mono text-cyan-400">{currentBalance.toFixed(4)} ETH</p>
+            <p className="text-3xl font-mono text-cyan-400">{currentBalance.toFixed(4)} TON</p>
           </div>
 
-          <div className="text-center bg-gray-900 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white">Deposit ETH</h3>
-            <p className="text-sm text-gray-400 mb-4">Send ETH to the address below to fund your account. This is a simulation.</p>
-            {/* Fake QR Code */}
-            <div className="bg-white p-2 rounded-lg inline-block mb-4">
-              <svg width="140" height="140" viewBox="0 0 100 100" className="bg-white">
-                <path d="M0 0 H20 V20 H0 Z M80 0 H100 V20 H80 Z M0 80 H20 V100 H0 Z M30 0 H40 V10 H30 Z M50 0 H60 V10 H50 Z M0 30 H10 V40 H0 Z M0 50 H10 V60 H0 Z M90 30 H100 V40 H90 Z M90 50 H100 V60 H90 Z M30 90 H40 V100 H30 Z M50 90 H60 V100 H50 Z M30 30 H70 V70 H30 Z M25 25 H75 V75 H25 Z M40 40 H60 V60 H40 Z" fill="black"/>
-              </svg>
-            </div>
-            <div className="bg-gray-700 p-3 rounded-lg flex items-center justify-between">
-              <span className="text-sm font-mono text-gray-300 break-all">{walletAddress}</span>
-              <button onClick={() => handleCopy(walletAddress)} className="ml-4 bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-2 rounded text-xs">
-                COPY
-              </button>
-            </div>
-          </div>
-
-          {/* This button is for simulation purposes */}
-          <button 
-            onClick={() => { onDeposit(0.1); onClose(); }} 
-            className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-colors"
-          >
-            Simulate 0.1 ETH Deposit
-          </button>
+          {step === 'input' ? renderInputStep() : renderConfirmStep()}
+          
         </div>
       </div>
     </div>

@@ -14,6 +14,14 @@ const API_URL = (import.meta as any).env.VITE_API_URL;
 const SUITS_ORDERED = Object.values(Suit);
 const RANKS_ORDERED = Object.values(Rank);
 
+const suitTranslations: Record<Suit, string> = {
+    [Suit.HEARTS]: 'Червы',
+    [Suit.DIAMONDS]: 'Бубны',
+    [Suit.CLUBS]: 'Трефы',
+    [Suit.SPADES]: 'Пики',
+};
+
+
 const CollapsibleSection: React.FC<{ title: string, children: React.ReactNode }> = ({ title, children }) => {
     const [isOpen, setIsOpen] = useState(false);
     return (
@@ -48,7 +56,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
             }
         } catch (error) {
             console.error("Failed to fetch admin data:", error);
-            alert("Could not connect to the server to fetch admin data.");
+            alert("Не удалось подключиться к серверу для получения данных.");
         } finally {
             setIsLoading(false);
         }
@@ -91,7 +99,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
     };
 
     const addSlotSymbol = () => {
-        const newSymbol: SlotSymbol = { name: 'New Symbol', imageUrl: '', payout: 10, weight: 1 };
+        const newSymbol: SlotSymbol = { name: 'Новый символ', imageUrl: '', payout: 10, weight: 1 };
         setLocalAssets(prev => ({...prev, slotSymbols: [...prev.slotSymbols, newSymbol]}));
     }
 
@@ -111,10 +119,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
             if (!response.ok) throw new Error('Failed to save assets');
             const updatedAssets = await response.json();
             setAssets(updatedAssets);
-            alert('Assets updated!');
+            alert('Настройки сохранены!');
         } catch (error) {
             console.error(error);
-            alert('Error saving assets.');
+            alert('Ошибка сохранения настроек.');
         }
     };
 
@@ -125,15 +133,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
             const defaultAssets = await response.json();
             setLocalAssets(defaultAssets);
             setAssets(defaultAssets);
-            alert('Assets reset to default!');
+            alert('Настройки сброшены по умолчанию!');
         } catch (error) {
             console.error(error);
-            alert('Error resetting assets.');
+            alert('Ошибка сброса настроек.');
         }
     };
     
     const grantReward = async (userId: string) => {
-        const amountStr = prompt(`Enter amount of Play Money to grant to user ${userId}:`);
+        const amountStr = prompt(`Введите сумму игровых денег для пользователя ${userId}:`);
         if (amountStr) {
             const amount = parseFloat(amountStr);
             if (!isNaN(amount) && amount > 0) {
@@ -146,13 +154,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
                     if (!response.ok) throw new Error('Failed to grant reward');
                     const updatedUser = await response.json();
                     setUsers(users.map(u => u.id === userId ? updatedUser : u));
-                    alert(`Granted ${amount} Play Money to user ${userId}.`);
+                    alert(`Выдано ${amount} игровых денег пользователю ${userId}.`);
                 } catch (error) {
                      console.error(error);
-                     alert('Error granting reward.');
+                     alert('Ошибка выдачи награды.');
                 }
             } else {
-                alert('Invalid amount.');
+                alert('Неверная сумма.');
             }
         }
     };
@@ -170,10 +178,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
             }
             const updatedUser = await response.json();
             setUsers(users.map(u => u.id === userId ? updatedUser : u));
-            alert(`User ${updatedUser.name}'s role updated to ${newRole}.`);
+            alert(`Роль пользователя ${updatedUser.name} изменена на ${newRole}.`);
         } catch (error) {
             console.error(error);
-            alert(`Error updating role: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            alert(`Ошибка изменения роли: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
@@ -183,31 +191,31 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
             <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gray-900/50 z-20">
                 <button onClick={onExit} className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
                     <ExitIcon className="w-6 h-6" />
-                    <span>{isBrowserView ? 'Logout' : 'Lobby'}</span>
+                    <span>{isBrowserView ? 'Выйти' : 'Лобби'}</span>
                 </button>
-                <h1 className="text-xl font-bold text-cyan-400">Admin Panel</h1>
+                <h1 className="text-xl font-bold text-cyan-400">Панель администратора</h1>
                 <div className="w-24"></div>
             </div>
 
             <div className="max-w-7xl mx-auto pt-20 space-y-8">
                 {isLoading ? (
                     <div className="text-center">
-                        <p className="text-lg">Loading Admin Data...</p>
+                        <p className="text-lg">Загрузка данных...</p>
                     </div>
                 ) : (
                 <>
                 {/* Player Management */}
                 <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-                    <h2 className="text-2xl font-bold mb-4 text-white">Player Management</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-white">Управление игроками</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-gray-700/50 text-xs text-gray-300 uppercase tracking-wider">
                                 <tr>
-                                    <th className="p-3">Player</th>
-                                    <th className="p-3">Play Money</th>
-                                    <th className="p-3">Real Money (ETH)</th>
-                                    <th className="p-3">Role</th>
-                                    <th className="p-3">Actions</th>
+                                    <th className="p-3">Игрок</th>
+                                    <th className="p-3">Игровые деньги</th>
+                                    <th className="p-3">Реальные деньги (ETH)</th>
+                                    <th className="p-3">Роль</th>
+                                    <th className="p-3">Действия</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
@@ -228,7 +236,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
                                         <td className="p-3">
                                           <div className="flex items-center space-x-2">
                                               <button onClick={() => grantReward(user.id)} className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1 rounded-md text-sm">
-                                                  Grant Reward
+                                                  Выдать награду
                                               </button>
                                               {user.role !== 'ADMIN' && (
                                                    <select
@@ -236,8 +244,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
                                                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                                       className="bg-gray-700 border border-gray-600 text-white text-sm rounded-md focus:ring-cyan-500 focus:border-cyan-500"
                                                   >
-                                                      <option value="PLAYER">Set as Player</option>
-                                                      <option value="MODERATOR">Set as Moderator</option>
+                                                      <option value="PLAYER">Сделать игроком</option>
+                                                      <option value="MODERATOR">Сделать модератором</option>
                                                   </select>
                                               )}
                                           </div>
@@ -252,37 +260,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
                 {/* Asset Customization */}
                 <div className="bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-white">Asset Customization</h2>
+                        <h2 className="text-2xl font-bold text-white">Настройка ассетов</h2>
                         <div className="flex space-x-4">
-                            <button onClick={saveAssets} className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-md">Save All Changes</button>
-                            <button onClick={resetAssets} className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 rounded-md">Reset to Default</button>
+                            <button onClick={saveAssets} className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded-md">Сохранить все изменения</button>
+                            <button onClick={resetAssets} className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 rounded-md">Сбросить по умолчанию</button>
                         </div>
                     </div>
                     
                     <div className="space-y-6">
                         {/* General Assets */}
                         <div className="space-y-4">
-                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2">General</h3>
+                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2">Общие</h3>
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Card Back URL</label>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">URL рубашки карт</label>
                                 <input type="text" name="cardBackUrl" value={localAssets.cardBackUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Table Background URL</label>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">URL фона стола</label>
                                 <input type="text" name="tableBackgroundUrl" value={localAssets.tableBackgroundUrl} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Пароль для режима бога</label>
+                                <input type="text" name="godModePassword" value={localAssets.godModePassword || ''} onChange={handleAssetChange} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                             </div>
                         </div>
 
                         {/* Card Faces */}
                         <div>
-                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Card Faces</h3>
+                            <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Изображения карт</h3>
                             <div className="space-y-2">
                             {SUITS_ORDERED.map(suit => (
-                                <CollapsibleSection key={suit} title={suit.charAt(0) + suit.slice(1).toLowerCase()}>
+                                <CollapsibleSection key={suit} title={suitTranslations[suit]}>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {RANKS_ORDERED.map(rank => (
                                             <div key={rank}>
-                                                <label className="block text-xs font-medium text-gray-400 mb-1">Rank {rank}</label>
+                                                <label className="block text-xs font-medium text-gray-400 mb-1">Ранг {rank}</label>
                                                 <input
                                                     type="text"
                                                     value={localAssets.cardFaces[suit]?.[rank] || ''}
@@ -299,36 +311,36 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onExit, isBrowserView }) => {
 
                         {/* Slot Symbols */}
                         <div>
-                             <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Slot Machine Symbols</h3>
+                             <h3 className="text-xl font-semibold text-cyan-400 border-b border-gray-600 pb-2 mb-4">Символы слот-машины</h3>
                              <div className="space-y-4">
                                 {localAssets.slotSymbols.map((symbol, index) => (
                                     <div key={index} className="grid grid-cols-12 gap-3 items-center bg-gray-900/50 p-3 rounded-lg">
                                         <div className="col-span-3">
-                                            <label className="text-xs text-gray-400">Name</label>
+                                            <label className="text-xs text-gray-400">Название</label>
                                             <input type="text" value={symbol.name} onChange={e => handleSlotSymbolChange(index, 'name', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
                                         </div>
                                          <div className="col-span-5">
-                                            <label className="text-xs text-gray-400">Image URL</label>
+                                            <label className="text-xs text-gray-400">URL изображения</label>
                                             <input type="text" value={symbol.imageUrl} onChange={e => handleSlotSymbolChange(index, 'imageUrl', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
                                         </div>
                                          <div className="col-span-1">
-                                            <label className="text-xs text-gray-400">Payout</label>
+                                            <label className="text-xs text-gray-400">Выплата</label>
                                             <input type="number" value={symbol.payout} onChange={e => handleSlotSymbolChange(index, 'payout', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="text-xs text-gray-400">Weight</label>
+                                            <label className="text-xs text-gray-400">Вес (редкость)</label>
                                             <input type="number" value={symbol.weight} onChange={e => handleSlotSymbolChange(index, 'weight', e.target.value)} className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm"/>
                                         </div>
                                         <div className="col-span-2 flex justify-end">
                                             <button onClick={() => removeSlotSymbol(index)} className="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded-md text-sm mt-4">
-                                                Delete
+                                                Удалить
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                              </div>
                              <button onClick={addSlotSymbol} className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-md text-sm">
-                                Add New Symbol
+                                Добавить новый символ
                              </button>
                         </div>
 
