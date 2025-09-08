@@ -8,6 +8,9 @@ import AdminLogin from './components/AdminLogin';
 import { AssetProvider } from './contexts/AssetContext';
 import { GameMode, TableConfig } from './types';
 
+// Tell TypeScript about the global TonConnectUIReact object from the CDN script
+declare const TonConnectUIReact: any;
+
 type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE' | 'ADMIN';
 
 interface TelegramUser {
@@ -175,12 +178,29 @@ const AppRouter: FC = () => {
   return <TelegramFlow />;
 }
 
+// TON Connect manifest definition. This describes our app to the wallet.
+const tonConnectManifest = {
+    url: 'https://crypto-poker.netlify.app', // A placeholder URL
+    name: 'Crypto Poker Club',
+    iconUrl: 'https://www.svgrepo.com/show/475685/poker-chip.svg' // A placeholder icon
+};
 
-const App: FC = () => (
-  <AssetProvider>
-    <AppRouter />
-  </AssetProvider>
-);
+
+const App: FC = () => {
+  // The TonConnectUIProvider must wrap the entire app that needs wallet access.
+  // We provide the manifest as a data URL to avoid needing a separate JSON file.
+  const { TonConnectUIProvider } = TonConnectUIReact;
+  
+  return (
+    <TonConnectUIProvider 
+        manifestUrl={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(tonConnectManifest))}`}
+    >
+        <AssetProvider>
+            <AppRouter />
+        </AssetProvider>
+    </TonConnectUIProvider>
+  );
+};
 
 
 export default App;
