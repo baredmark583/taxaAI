@@ -1,18 +1,15 @@
 
 
-
 import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
 import Slots from './components/Slots';
 import Roulette from './components/Roulette';
-import AdminPanel from './components/AdminPanel';
-import AdminLogin from './components/AdminLogin';
 import { AssetProvider } from './contexts/AssetContext';
 import { GameMode, TableConfig } from './types';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 
-type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE' | 'ADMIN';
+type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE';
 
 interface TelegramUser {
   id: number;
@@ -118,64 +115,20 @@ const TelegramFlow: FC = () => {
     );
   }
 
-  if (activeGame === 'ADMIN') {
-    return (
-      <AdminPanel onExit={handleExit} />
-    );
-  }
-
   return (
     <Lobby 
       onEnterPoker={handleEnterPoker}
       onEnterSlots={() => setActiveGame('SLOTS')}
       onEnterRoulette={() => setActiveGame('ROULETTE')}
-      onEnterAdmin={() => setActiveGame('ADMIN')}
       realMoneyBalance={realMoneyBalance}
       playMoneyBalance={playMoneyBalance}
       setRealMoneyBalance={setRealMoneyBalance}
-      isAdmin={isAdmin}
     />
   );
 };
 
-
-const AdminFlow: FC = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(sessionStorage.getItem('isAdminAuthenticated') === 'true');
-
-    const handleLogout = () => {
-        sessionStorage.removeItem('isAdminAuthenticated');
-        setIsAuthenticated(false);
-    };
-
-    if (!isAuthenticated) {
-        return <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />;
-    }
-
-    return <AdminPanel onExit={handleLogout} isBrowserView={true} />;
-};
-
-
 const AppRouter: FC = () => {
-  // Get the hash part of the URL (e.g., '#/admin') and remove the leading '#'
-  const getRoute = () => window.location.hash.substring(1);
-  const [route, setRoute] = useState(getRoute());
-
-  useEffect(() => {
-    const onHashChange = () => {
-      setRoute(getRoute());
-    };
-    
-    // Listen for hash changes (e.g., clicking links, browser back/forward)
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
-  
-  // Check if the route starts with '/admin'
-  if (route.toLowerCase().startsWith('/admin')) {
-    return <AdminFlow />;
-  }
-  
-  // Default to the main Telegram app flow
+  // Default to the main Telegram app flow, as the admin panel is now separate.
   return <TelegramFlow />;
 }
 
@@ -222,8 +175,8 @@ const App: FC = () => {
   return (
     <TonConnectUIProvider 
         manifestUrl={manifestUrl}
-        // FIX: The prop 'walletsListSource' does not exist on TonConnectUIProviderProps. Changed to 'walletsList' to match the expected prop name.
-        walletsList={wallets} // Provide the filtered list to the UI provider
+        // FIX: The prop 'walletsList' does not exist on TonConnectUIProviderProps. It has been replaced with 'walletsListConfiguration' in newer versions of the library.
+        walletsListConfiguration={{ includeWallets: wallets }}
     >
         <AssetProvider>
             <AppRouter />
