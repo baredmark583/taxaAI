@@ -186,11 +186,11 @@ const tonConnectManifest = {
 
 const App: FC = () => {
   // The TonConnectUIProvider must wrap the entire app that needs wallet access.
-  // We provide the manifest as a data URL to avoid needing a separate JSON file.
+  // In v3, we pass the manifest object directly to the 'manifest' prop.
   
   return (
     <TonConnectUIProvider 
-        manifestUrl={`data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(tonConnectManifest))}`}
+        manifest={tonConnectManifest}
     >
         <AssetProvider>
             <AppRouter />
