@@ -221,8 +221,8 @@ const App: FC = () => {
   return (
     <TonConnectUIProvider 
         manifestUrl={manifestUrl}
-        // FIX: The correct prop to provide a custom wallets list is `walletsListSource`.
-        walletsListSource={wallets} // Provide the filtered list to the UI provider
+        // FIX: The prop 'walletsListSource' does not exist on TonConnectUIProviderProps. Changed to 'walletsList'.
+        walletsList={wallets} // Provide the filtered list to the UI provider
     >
         <AssetProvider>
             <AppRouter />
