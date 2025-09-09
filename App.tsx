@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -17,6 +18,7 @@ interface TelegramUser {
   first_name: string;
   last_name?: string;
   username?: string;
+  photo_url?: string;
 }
 
 const ADMIN_TELEGRAM_ID = 7327258482;

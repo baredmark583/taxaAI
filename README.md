@@ -52,7 +52,7 @@ This project requires deploying three separate services on [Render](https://rend
     | `ADMIN_PASSWORD`| **Optional.** A password for the legacy browser-based admin login.              | `supersecret_poker_password`                   |
     
 4.  **Deploy:**
-    *   Click "Create Web Service". Note the URL it gets (e.g., `https://poker-backend.onrender.com`).
+    *   Click "Create Web Service". Note the URL it gets (e.g., `https://poker-backend.onrender.com`). Render will also assign it a port (usually `10000`), which you'll need for the admin panel's internal URL.
 
 ---
 
@@ -97,9 +97,12 @@ This project requires deploying three separate services on [Render](https://rend
 3.  **Add Environment Variables:**
     *   Go to the "Environment" tab. Add the following:
 
-    | Key                     | Description                                            | Example Value                        |
-    | :---------------------- | :----------------------------------------------------- | :----------------------------------- |
-    | `NEXT_PUBLIC_API_URL`   | The public URL of the **backend game server**.         | `https://poker-backend.onrender.com` |
+    | Key                     | Description                                                                                                                              | Example Value                        |
+    | :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------- |
+    | `INTERNAL_API_URL`      | **Recommended.** The private URL of the game server for faster server-to-server communication. The format is `http://<game-server-name>:<port>`. | `http://poker-backend:10000`         |
+    | `NEXT_PUBLIC_API_URL`   | The public URL of the **backend game server**. Required for client-side requests.                                                        | `https://poker-backend.onrender.com` |
+
+    **Note:** Using the `INTERNAL_API_URL` is highly recommended for performance. It allows the admin panel to fetch initial data from the game server over Render's fast private network, preventing timeout errors and significantly speeding up the initial load of the dashboard.
 
 4.  **Deploy:**
     *   Click "Create Web Service". You can now access your new admin panel at its public URL.

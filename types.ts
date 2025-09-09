@@ -1,6 +1,7 @@
 
 
 
+
 export enum Suit {
   HEARTS = 'HEARTS',
   DIAMONDS = 'DIAMONDS',
@@ -49,6 +50,7 @@ export interface Player {
   isBigBlind: boolean;
   isThinking: boolean;
   position: number;
+  avatarUrl?: string;
   handResult?: HandResult;
 }
 

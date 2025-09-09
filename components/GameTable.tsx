@@ -13,6 +13,7 @@ interface TelegramUser {
   first_name: string;
   last_name?: string;
   username?: string;
+  photo_url?: string;
 }
 
 interface GameTableProps {
@@ -85,10 +86,10 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
 
 
       <div 
-        className="relative w-[95vw] h-[60vh] max-w-4xl max-h-[600px] bg-green-900 border-[12px] border-gray-800 rounded-[50px] shadow-2xl flex items-center justify-center bg-cover bg-center shadow-[0_0_25px_rgba(0,255,255,0.3)]"
+        className="relative w-[95vw] h-[60vh] max-w-4xl max-h-[600px] bg-green-900 border-[12px] border-gray-800 rounded-[50%] shadow-2xl flex items-center justify-center bg-cover bg-center shadow-[0_0_25px_rgba(0,255,255,0.3)]"
         style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}
        >
-        <div className="absolute w-[80%] h-[75%] border-4 border-yellow-700/50 rounded-[40px]"></div>
+        <div className="absolute w-[80%] h-[75%] border-4 border-yellow-700/50 rounded-[50%]"></div>
         
         {/* Pot */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[120%] z-10 text-center">

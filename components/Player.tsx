@@ -19,13 +19,18 @@ const cardIsPartOfHand = (card: CardType, handCards: CardType[] = []) => {
 }
 
 const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, formatCurrency, godModeActive, gamePhase }) => {
-  const { name, stack, cards, bet, isFolded, isDealer, isThinking, handResult } = player;
+  const { name, stack, cards, bet, isFolded, isDealer, isThinking, handResult, avatarUrl } = player;
   
   const cardContainerClass = isUser ? 'space-x-[-40px]' : 'space-x-[-25px]';
   const cardScale = isUser ? 'scale-100' : 'scale-75';
   
   const isShowdown = gamePhase === GamePhase.SHOWDOWN;
   const showHand = isUser || godModeActive || (isShowdown && !isFolded);
+
+  // Condition to show hand strength text for the user, or for anyone at showdown
+  const showHandStrength = (isUser || (isShowdown && !isFolded)) && handResult && handResult.rank > -1;
+
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
 
   return (
     <div className={`relative flex flex-col items-center transition-all duration-300 ${isFolded ? 'opacity-40' : ''}`}>
@@ -41,16 +46,26 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
         )}
       </div>
       
-      {/* Player info box */}
-      <div className={`relative bg-black/40 backdrop-blur-sm border-2 rounded-lg px-2 py-1 shadow-md text-center w-28 sm:w-32 overflow-hidden ${isActive ? 'border-cyan-400 scale-105 shadow-cyan-500/30' : 'border-gray-600/50'}`}>
-        <p className="text-white font-bold text-xs sm:text-sm truncate">{name}</p>
-        <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
-         <p className="text-yellow-400 font-semibold text-[10px] sm:text-xs h-3 sm:h-4 capitalize">
-            {(showHand && handResult && handResult.rank > -1) ? handResult.name : ''}
-        </p>
-        { isThinking && <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div> }
-         {/* Timer Bar for active player */}
-        {isActive && !isFolded && (
+      {/* Avatar + Info Block */}
+      <div className="relative flex flex-col items-center">
+        {/* Avatar Container (acts as the circular seat) */}
+        <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-800 border-2 transition-all duration-300 ${isActive ? 'border-cyan-400 scale-105 shadow-lg shadow-cyan-500/30' : 'border-gray-600/50'} flex items-center justify-center text-white font-bold overflow-hidden`}>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xl sm:text-2xl">{initials}</span>
+          )}
+          {isThinking && <div className="absolute top-0 right-0 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>}
+        </div>
+
+        {/* Info box (below avatar) */}
+        <div className="relative bg-black/40 backdrop-blur-sm rounded-lg px-2 py-1 text-center w-28 sm:w-32 overflow-hidden mt-[-16px] z-10 border border-gray-700/50">
+          <p className="text-white font-bold text-xs sm:text-sm truncate">{name}</p>
+          <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
+          <p className="text-yellow-400 font-semibold text-[10px] sm:text-xs h-4 capitalize flex items-center justify-center">
+            {showHandStrength ? handResult.name : <span>&nbsp;</span>}
+          </p>
+          {isActive && !isFolded && (
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-cyan-400/50">
                 <div className="h-full bg-cyan-400 animate-timer-bar"></div>
                  <style>{`
@@ -63,12 +78,13 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
                     }
                 `}</style>
             </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Bet amount */}
       {bet > 0 && (
-        <div className="absolute -bottom-7 bg-black/70 rounded-full px-3 py-1 text-sm font-bold text-yellow-300 border border-yellow-500">
+        <div className="absolute top-[150px] bg-black/70 rounded-full px-3 py-1 text-sm font-bold text-yellow-300 border border-yellow-500">
           {currency}{formatCurrency(bet)}
         </div>
       )}
