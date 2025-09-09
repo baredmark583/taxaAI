@@ -6,9 +6,10 @@ interface CardProps {
   card: CardType;
   revealed: boolean;
   isHighlighted?: boolean;
+  overrideBackUrl?: string;
 }
 
-const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted }) => {
+const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted, overrideBackUrl }) => {
   const { assets } = useContext(AssetContext);
 
   const getCardImageUrl = (card: CardType): string => {
@@ -23,7 +24,7 @@ const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted }) => {
     }
   };
 
-  const imageUrl = revealed ? getCardImageUrl(card) : assets.cardBackUrl;
+  const imageUrl = revealed ? getCardImageUrl(card) : overrideBackUrl || assets.cardBackUrl;
 
   return (
     <div className={`w-14 h-20 sm:w-16 sm:h-24 bg-white rounded-lg shadow-lg transition-all duration-300 ${isHighlighted ? 'ring-4 ring-yellow-400 shadow-xl shadow-yellow-500/40 transform scale-105' : ''}`}>

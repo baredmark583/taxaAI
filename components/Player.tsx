@@ -7,10 +7,10 @@ interface PlayerProps {
   player: PlayerType;
   isUser: boolean;
   isActive: boolean;
-  currency: string;
-  formatCurrency: (amount: number) => string;
+  formatDisplayAmount: (amount: number) => string;
   godModeActive: boolean;
   gamePhase: GamePhase;
+  overrideCardBackUrl?: string;
 }
 
 const cardIsPartOfHand = (card: CardType, handCards: CardType[] = []) => {
@@ -18,7 +18,7 @@ const cardIsPartOfHand = (card: CardType, handCards: CardType[] = []) => {
     return handCards.some(handCard => handCard.rank === card.rank && handCard.suit === card.suit);
 }
 
-const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, formatCurrency, godModeActive, gamePhase }) => {
+const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, formatDisplayAmount, godModeActive, gamePhase, overrideCardBackUrl }) => {
   const { name, stack, cards, bet, isFolded, isDealer, isThinking, handResult, avatarUrl } = player;
   
   const cardContainerClass = isUser ? 'space-x-[-40px]' : 'space-x-[-25px]';
@@ -38,8 +38,8 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
       <div className={`flex justify-center mb-1 h-20 sm:h-24 ${cardContainerClass} ${cardScale}`}>
         {cards.length > 0 ? (
           <>
-            <Card card={cards[0]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[0], handResult?.cards)} />
-            <Card card={cards[1]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[1], handResult?.cards)} />
+            <Card card={cards[0]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[0], handResult?.cards)} overrideBackUrl={overrideCardBackUrl} />
+            <Card card={cards[1]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[1], handResult?.cards)} overrideBackUrl={overrideCardBackUrl} />
           </>
         ) : (
           <div className="w-20 h-24" /> // Placeholder for height
@@ -61,7 +61,7 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
         {/* Info box (below avatar) */}
         <div className="relative bg-black/40 backdrop-blur-sm rounded-lg px-2 py-1 text-center w-28 sm:w-32 overflow-hidden mt-[-16px] z-10 border border-gray-700/50">
           <p className="text-white font-bold text-xs sm:text-sm truncate">{name}</p>
-          <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
+          <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{formatDisplayAmount(stack)}</p>
           <p className="text-yellow-400 font-semibold text-[10px] sm:text-xs h-4 capitalize flex items-center justify-center">
             {showHandStrength ? handResult.name : <span>&nbsp;</span>}
           </p>
@@ -85,7 +85,7 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
       {/* Bet amount */}
       {bet > 0 && (
         <div className="absolute top-[150px] bg-black/70 rounded-full px-3 py-1 text-sm font-bold text-yellow-300 border border-yellow-500">
-          {currency}{formatCurrency(bet)}
+          {formatDisplayAmount(bet)}
         </div>
       )}
 

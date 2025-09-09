@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { GameMode, TableConfig, GamePhase } from '../types';
 import Player from './Player';
 import CommunityCards from './CommunityCards';
@@ -14,6 +14,11 @@ interface TelegramUser {
   last_name?: string;
   username?: string;
   photo_url?: string;
+}
+
+interface UserSettings {
+    cardBackUrl: string;
+    showInBB: boolean;
 }
 
 interface GameTableProps {
@@ -44,6 +49,35 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
   const userId = telegramUser.id.toString();
   const { state, dispatchPlayerAction, isConnected } = usePokerGame(initialStack, table.maxPlayers, table.stakes.small, table.stakes.big, userId, initData);
 
+  const [userSettings, setUserSettings] = useState<UserSettings>({
+    cardBackUrl: assets.cardBackUrl,
+    showInBB: false,
+  });
+
+  useEffect(() => {
+    try {
+        const savedSettings = localStorage.getItem('pokerUserSettings');
+        if (savedSettings) {
+            const parsedSettings = JSON.parse(savedSettings);
+            // Make sure the loaded settings include a valid card back url, otherwise keep default
+            if (!parsedSettings.cardBackUrl) {
+                parsedSettings.cardBackUrl = assets.cardBackUrl;
+            }
+            setUserSettings(parsedSettings);
+        } else {
+            // If no settings saved, use the default from assets
+            setUserSettings(prev => ({ ...prev, cardBackUrl: assets.cardBackUrl }));
+        }
+    } catch (error) {
+        console.error("Failed to load user settings from localStorage", error);
+        setUserSettings(prev => ({ ...prev, cardBackUrl: assets.cardBackUrl }));
+    }
+  }, [assets.cardBackUrl]);
+
+  const handleSettingsChange = useCallback((newSettings: Partial<UserSettings>) => {
+    setUserSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
+
   if (!isConnected || !state) {
       return (
           <div className="w-screen h-screen bg-gray-900 flex flex-col items-center justify-center text-white">
@@ -53,17 +87,22 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
       );
   }
 
-  const { players, communityCards, pot, activePlayerIndex, gamePhase, log } = state;
+  const { players, communityCards, pot, activePlayerIndex, gamePhase, log, bigBlind } = state;
 
   const userPlayer = players.find(p => p.id === userId);
   const otherPlayers = players.filter(p => p.id !== userId);
   const currency = table.mode === GameMode.REAL_MONEY ? 'TON' : '$';
-  const formatCurrency = (amount: number) => {
-      if (table.mode === GameMode.REAL_MONEY) {
-          return amount.toFixed(4);
+  
+  const formatDisplayAmount = useCallback((amount: number) => {
+      if (userSettings.showInBB && bigBlind > 0) {
+          const amountInBB = amount / bigBlind;
+          return `${amountInBB.toFixed(1)} ББ`;
       }
-      return amount.toLocaleString();
-  }
+      if (table.mode === GameMode.REAL_MONEY) {
+          return `${currency}${amount.toFixed(4)}`;
+      }
+      return `${currency}${amount.toLocaleString()}`;
+  }, [userSettings.showInBB, bigBlind, table.mode, currency]);
 
   const userHandCards = userPlayer?.handResult?.cards || [];
 
@@ -77,7 +116,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
             </button>
             <div className="text-center">
                 <p className="text-lg font-bold text-cyan-400">{table.name}</p>
-                <p className="text-xs text-gray-400">Stakes: {currency}{formatCurrency(table.stakes.small)}/{currency}{formatCurrency(table.stakes.big)}</p>
+                <p className="text-xs text-gray-400">Stakes: {currency}{table.stakes.small}/{currency}{table.stakes.big}</p>
             </div>
             <button onClick={() => setIsSettingsOpen(true)} className="text-gray-300 hover:text-white transition-colors">
                 <SettingsIcon className="w-6 h-6" />
@@ -94,7 +133,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
         {/* Pot */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[120%] z-10 text-center">
           <div className="bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 border border-gray-700">
-            <p className="text-white text-lg font-bold">{currency}{formatCurrency(pot)}</p>
+            <p className="text-white text-lg font-bold">{formatDisplayAmount(pot)}</p>
             <p className="text-yellow-400 text-xs uppercase tracking-wider">Total Pot</p>
           </div>
         </div>
@@ -105,14 +144,14 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
         {/* Opponent Players */}
         {otherPlayers.map((player, index) => (
             <div key={player.id} className="absolute" style={positions[index + 1]}>
-                <Player player={player} isUser={false} isActive={players[activePlayerIndex]?.id === player.id} currency={currency} formatCurrency={formatCurrency} godModeActive={isGodMode} gamePhase={gamePhase} />
+                <Player player={player} isUser={false} isActive={players[activePlayerIndex]?.id === player.id} formatDisplayAmount={formatDisplayAmount} godModeActive={isGodMode} gamePhase={gamePhase} />
             </div>
         ))}
         
         {/* User Player */}
         {userPlayer && (
-          <div className="absolute bottom-[-20px] left-1/2 -translate-x-1/2">
-             <Player player={userPlayer} isUser={true} isActive={players[activePlayerIndex]?.id === userPlayer.id} currency={currency} formatCurrency={formatCurrency} godModeActive={isGodMode} gamePhase={gamePhase} />
+          <div className="absolute bottom-[-70px] left-1/2 -translate-x-1/2">
+             <Player player={userPlayer} isUser={true} isActive={players[activePlayerIndex]?.id === userPlayer.id} formatDisplayAmount={formatDisplayAmount} godModeActive={isGodMode} gamePhase={gamePhase} overrideCardBackUrl={userSettings.cardBackUrl} />
           </div>
         )}
 
@@ -132,8 +171,8 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
                 onAction={dispatchPlayerAction}
                 currentBet={state.currentBet}
                 smallBlind={state.smallBlind}
-                currency={currency}
-                formatCurrency={formatCurrency}
+                bigBlind={state.bigBlind}
+                formatDisplayAmount={formatDisplayAmount}
              />
         )}
       
@@ -142,6 +181,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
         onClose={() => setIsSettingsOpen(false)}
         onActivateGodMode={() => setIsGodMode(true)}
         isAdmin={isAdmin}
+        onSettingsChange={handleSettingsChange}
       />
 
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { AssetContext } from '../contexts/AssetContext';
 
 interface SettingsModalProps {
@@ -6,12 +6,57 @@ interface SettingsModalProps {
   onClose: () => void;
   onActivateGodMode: () => void;
   isAdmin: boolean;
+  onSettingsChange: (settings: { cardBackUrl?: string; showInBB?: boolean }) => void;
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onActivateGodMode, isAdmin }) => {
+const predefinedCardBacks = [
+    { name: 'Default', url: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg' },
+    { name: 'Blue', url: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Blue_back.svg' },
+    { name: 'Abstract', url: 'https://www.svgrepo.com/show/472548/card-back.svg' },
+    { name: 'Black', url: 'https://www.svgrepo.com/show/424339/poker-gambling-game.svg' },
+];
+
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onActivateGodMode, isAdmin, onSettingsChange }) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const { assets } = useContext(AssetContext);
+
+  const [selectedBack, setSelectedBack] = useState(assets.cardBackUrl);
+  const [showInBB, setShowInBB] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+        try {
+            const savedSettings = localStorage.getItem('pokerUserSettings');
+            if (savedSettings) {
+                const { cardBackUrl, showInBB } = JSON.parse(savedSettings);
+                setSelectedBack(cardBackUrl || assets.cardBackUrl);
+                setShowInBB(!!showInBB);
+            } else {
+                 setSelectedBack(assets.cardBackUrl);
+            }
+        } catch (e) {
+            console.error("Could not parse settings from localStorage", e);
+            setSelectedBack(assets.cardBackUrl);
+        }
+    }
+  }, [isOpen, assets.cardBackUrl]);
+  
+  const saveSettings = useCallback(() => {
+     try {
+        const settings = { cardBackUrl: selectedBack, showInBB };
+        localStorage.setItem('pokerUserSettings', JSON.stringify(settings));
+        onSettingsChange(settings);
+     } catch(e) {
+        console.error("Could not save settings to localStorage", e);
+     }
+  }, [selectedBack, showInBB, onSettingsChange]);
+
+  useEffect(() => {
+    if(isOpen) {
+        saveSettings();
+    }
+  }, [selectedBack, showInBB, isOpen, saveSettings]);
 
   if (!isOpen) return null;
 
@@ -41,39 +86,57 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onActiva
             <button onClick={handleClose} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
           </div>
           
-          {isAdmin && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="god-mode-code" className="block text-sm font-medium text-gray-300 mb-2">
-                  Режим Бога (админ)
-                </label>
-                <input
-                  type="password"
-                  id="god-mode-code"
-                  value={code}
-                  onChange={(e) => {
-                      setCode(e.target.value);
-                      setError('');
-                  }}
-                  placeholder="Введите код администратора"
-                  className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                />
-                {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Внешний вид</label>
+              <div className="p-3 bg-gray-900/50 rounded-lg">
+                <p className="text-xs text-gray-400 mb-2">Рубашка карт</p>
+                <div className="grid grid-cols-4 gap-2">
+                    {predefinedCardBacks.map(back => (
+                        <button key={back.name} onClick={() => setSelectedBack(back.url)} className={`w-full h-16 bg-cover bg-center rounded-md border-2 transition-all ${selectedBack === back.url ? 'border-cyan-500 scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`} style={{backgroundImage: `url(${back.url})`}} title={back.name} />
+                    ))}
+                </div>
               </div>
-              <button
-                type="submit"
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors"
-              >
-                Активировать
-              </button>
-            </form>
-          )}
-
-          {!isAdmin && (
-            <div className="text-center text-gray-400">
-                <p>Специальные настройки отсутствуют.</p>
             </div>
-          )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Игровой процесс</label>
+               <div className="p-3 bg-gray-900/50 rounded-lg flex items-center justify-between">
+                    <span className="text-gray-200">Показывать ставки в больших блайндах (ББ)</span>
+                    <button onClick={() => setShowInBB(!showInBB)} className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${showInBB ? 'bg-cyan-600' : 'bg-gray-600'}`}>
+                        <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${showInBB ? 'translate-x-6' : 'translate-x-1'}`}/>
+                    </button>
+                </div>
+            </div>
+            
+            {isAdmin && (
+              <form onSubmit={handleSubmit} className="space-y-4 pt-4 border-t border-gray-700">
+                <div>
+                  <label htmlFor="god-mode-code" className="block text-sm font-medium text-gray-300 mb-2">
+                    Режим Бога (админ)
+                  </label>
+                  <input
+                    type="password"
+                    id="god-mode-code"
+                    value={code}
+                    onChange={(e) => {
+                        setCode(e.target.value);
+                        setError('');
+                    }}
+                    placeholder="Введите код администратора"
+                    className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                  {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors"
+                >
+                  Активировать
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>
