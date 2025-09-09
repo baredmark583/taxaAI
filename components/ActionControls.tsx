@@ -1,30 +1,33 @@
 import React, { useState } from 'react';
 import { Player, PlayerAction } from '../types';
-import { FoldIcon, CallIcon, RaiseIcon } from './Icons';
+import { RaiseIcon } from './Icons';
 
 interface ActionControlsProps {
   player: Player;
   isActive: boolean;
   onAction: (action: PlayerAction) => void;
   currentBet: number;
+  pot: number;
   smallBlind: number;
   bigBlind: number;
   formatDisplayAmount: (amount: number) => string;
 }
 
-const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAction, currentBet, smallBlind, bigBlind, formatDisplayAmount }) => {
-  const [betAmount, setBetAmount] = useState(currentBet > 0 ? currentBet * 2 : smallBlind * 2);
+const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAction, currentBet, pot, smallBlind, bigBlind, formatDisplayAmount }) => {
   const [isBetting, setIsBetting] = useState(false);
   
   const canCheck = player.bet === currentBet;
   const toCall = currentBet - player.bet;
+  const minRaise = Math.min(player.stack + player.bet, currentBet > 0 ? currentBet * 2 : bigBlind);
+  const [betAmount, setBetAmount] = useState(minRaise);
+
 
   const handleBetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBetAmount(Number(e.target.value));
   };
   
   const handleBetAction = () => {
-    if (betAmount > player.stack + player.bet) {
+    if (betAmount >= player.stack + player.bet) {
       onAction({ type: 'raise', amount: player.stack + player.bet });
     } else {
       onAction({ type: 'raise', amount: betAmount });
@@ -33,16 +36,22 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
   };
   
   if (!isActive || player.isFolded || player.isAllIn) {
-    return <div className="h-[120px] mt-4" />;
+    return <div className="h-[80px] mt-4" />;
   }
   
   if (isBetting) {
-    const minBet = Math.min(player.stack + player.bet, currentBet > 0 ? currentBet * 2 : bigBlind);
+    const minBet = minRaise;
     const maxBet = player.stack + player.bet;
     const actualBetAmount = Math.max(minBet, Math.min(betAmount, maxBet));
 
     return (
-        <div className="w-full max-w-lg mt-4 p-4 bg-black/40 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
+        <div className="w-full max-w-lg mt-4 p-3 bg-black/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
+            <div className="flex justify-between w-full mb-3 text-sm">
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.5), maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">1/2 Pot</button>
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.75), maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">3/4 Pot</button>
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(pot, maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">Pot</button>
+                <button onClick={() => setBetAmount(maxBet)} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">All-In</button>
+            </div>
             <input 
                 type="range" 
                 min={minBet}
@@ -50,16 +59,16 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
                 step={smallBlind}
                 value={actualBetAmount}
                 onChange={handleBetChange}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg accent-cyan-500"
+                className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer range-sm accent-green-500"
             />
-            <div className="flex justify-between w-full text-xs text-gray-400 px-1 mt-1 font-mono">
+             <div className="flex justify-between w-full text-xs text-gray-400 px-1 mt-1 font-mono">
                 <span>{formatDisplayAmount(minBet)}</span>
                 <span>{formatDisplayAmount(maxBet)}</span>
             </div>
-            <div className="flex items-center space-x-4 mt-4">
-                <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold">Cancel</button>
-                <button onClick={handleBetAction} className="px-10 py-3 bg-green-600 hover:bg-green-500 rounded-lg text-white font-bold text-lg shadow-lg shadow-green-500/20">
-                    Bet {formatDisplayAmount(actualBetAmount)}
+            <div className="flex items-center justify-between w-full space-x-4 mt-4">
+                <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold flex-1">Cancel</button>
+                <button onClick={handleBetAction} className="px-6 py-3 bg-green-600 hover:bg-green-500 rounded-lg text-white font-bold text-lg shadow-lg shadow-green-500/20 flex-1">
+                    Raise to {formatDisplayAmount(actualBetAmount)}
                 </button>
             </div>
         </div>
@@ -67,38 +76,43 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
   }
 
   return (
-    <div className="w-full max-w-lg mt-4 p-2 flex flex-wrap justify-center items-center gap-2">
+    <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center gap-2">
       <button
         onClick={() => onAction({ type: 'fold' })}
-        className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg shadow-lg shadow-red-500/20 transition-transform transform hover:scale-105"
+        className="flex-1 py-4 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
       >
-        <FoldIcon className="w-5 h-5 mr-2" />
-        <span>Fold</span>
+        Fold
       </button>
 
       {canCheck ? (
         <button
           onClick={() => onAction({ type: 'check' })}
-          className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          className="flex-1 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
         >
           Check
         </button>
       ) : (
         <button
           onClick={() => onAction({ type: 'call' })}
-          className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-transform transform hover:scale-105"
+          className="flex-1 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
         >
-          <CallIcon className="w-5 h-5 mr-2" />
-          <span>Call {formatDisplayAmount(toCall)}</span>
+          Call {toCall > 0 ? formatDisplayAmount(toCall) : ''}
         </button>
       )}
-
+      
       <button
-        onClick={() => setIsBetting(true)}
-        className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold rounded-lg shadow-lg shadow-green-500/20 transition-transform transform hover:scale-105"
+        onClick={() => { setBetAmount(minRaise); handleBetAction(); }}
+        disabled={minRaise > player.stack + player.bet}
+        className="flex-1 py-4 bg-green-700 hover:bg-green-600 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase disabled:bg-gray-600 disabled:opacity-50 disabled:scale-100"
       >
-        <RaiseIcon className="w-5 h-5 mr-2" />
-        <span>{currentBet > 0 ? 'Raise' : 'Bet'}</span>
+        {currentBet > 0 ? `Raise ${formatDisplayAmount(minRaise)}` : `Bet ${formatDisplayAmount(minRaise)}`}
+      </button>
+
+       <button
+        onClick={() => { setBetAmount(minRaise); setIsBetting(true); }}
+        className="p-4 bg-green-900 hover:bg-green-800 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
+      >
+        <RaiseIcon className="w-6 h-6" />
       </button>
     </div>
   );

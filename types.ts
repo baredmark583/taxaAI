@@ -1,7 +1,4 @@
 
-
-
-
 export enum Suit {
   HEARTS = 'HEARTS',
   DIAMONDS = 'DIAMONDS',
@@ -52,6 +49,7 @@ export interface Player {
   position: number;
   avatarUrl?: string;
   handResult?: HandResult;
+  lastActionDisplay?: string;
 }
 
 export enum GamePhase {

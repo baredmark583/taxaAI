@@ -1,7 +1,7 @@
 import React from 'react';
 import { Player as PlayerType, Card as CardType, GamePhase } from '../types';
 import Card from './Card';
-import { DealerChipIcon } from './Icons';
+import { DealerChipIcon, PokerChipIcon } from './Icons';
 
 interface PlayerProps {
   player: PlayerType;
@@ -19,23 +19,21 @@ const cardIsPartOfHand = (card: CardType, handCards: CardType[] = []) => {
 }
 
 const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, formatDisplayAmount, godModeActive, gamePhase, overrideCardBackUrl }) => {
-  const { name, stack, cards, bet, isFolded, isDealer, isThinking, handResult, avatarUrl } = player;
+  const { name, stack, cards, bet, isFolded, isDealer, handResult, avatarUrl, lastActionDisplay } = player;
   
-  const cardContainerClass = isUser ? 'space-x-[-40px]' : 'space-x-[-25px]';
-  const cardScale = isUser ? 'scale-100' : 'scale-75';
+  const cardContainerClass = isUser ? 'space-x-[-45px]' : 'space-x-[-30px]';
+  const cardScale = isUser ? '' : 'scale-[0.8]';
   
   const isShowdown = gamePhase === GamePhase.SHOWDOWN;
   const showHand = isUser || godModeActive || (isShowdown && !isFolded);
-
-  // Condition to show hand strength text for the user, or for anyone at showdown
   const showHandStrength = (isUser || (isShowdown && !isFolded)) && handResult && handResult.rank > -1;
 
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
 
   return (
-    <div className={`relative flex flex-col items-center transition-all duration-300 ${isFolded ? 'opacity-40' : ''}`}>
+    <div className={`relative flex flex-col items-center transition-all duration-300 w-32 ${isFolded ? 'opacity-40' : ''}`}>
       {/* Player cards */}
-      <div className={`flex justify-center mb-1 h-20 sm:h-24 ${cardContainerClass} ${cardScale}`}>
+      <div className={`flex justify-center h-20 sm:h-24 transform ${cardContainerClass} ${cardScale}`}>
         {cards.length > 0 ? (
           <>
             <Card card={cards[0]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[0], handResult?.cards)} overrideBackUrl={overrideCardBackUrl} />
@@ -46,28 +44,27 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, formatDisplay
         )}
       </div>
       
-      {/* Avatar + Info Block */}
-      <div className="relative flex flex-col items-center">
-        {/* Avatar Container (acts as the circular seat) */}
-        <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-800 border-2 transition-all duration-300 ${isActive ? 'border-cyan-400 scale-105 shadow-lg shadow-cyan-500/30' : 'border-gray-600/50'} flex items-center justify-center text-white font-bold overflow-hidden`}>
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-xl sm:text-2xl">{initials}</span>
-          )}
-          {isThinking && <div className="absolute top-0 right-0 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>}
+      {/* Avatar (positioned over the info box) */}
+      <div className="absolute top-12 sm:top-16 z-20">
+         <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gray-800 border-2 transition-all duration-300 ${isActive ? 'border-cyan-400 scale-105 shadow-lg shadow-cyan-500/30' : 'border-gray-600/50'} flex items-center justify-center text-white font-bold overflow-hidden`}>
+            {avatarUrl ? (
+                <img src={avatarUrl} alt={name} className="w-full h-full object-cover" />
+            ) : (
+                <span className="text-lg sm:text-xl">{initials}</span>
+            )}
         </div>
-
-        {/* Info box (below avatar) */}
-        <div className="relative bg-black/40 backdrop-blur-sm rounded-lg px-2 py-1 text-center w-28 sm:w-32 overflow-hidden mt-[-16px] z-10 border border-gray-700/50">
-          <p className="text-white font-bold text-xs sm:text-sm truncate">{name}</p>
-          <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{formatDisplayAmount(stack)}</p>
-          <p className="text-yellow-400 font-semibold text-[10px] sm:text-xs h-4 capitalize flex items-center justify-center">
+      </div>
+      
+      {/* Info Block */}
+      <div className="relative bg-black/70 backdrop-blur-sm rounded-lg text-center w-full overflow-hidden border border-gray-700/50 pt-8 pb-1">
+          <p className="text-white font-bold text-sm truncate px-1">{name}</p>
+          <p className={`font-mono text-base ${stack === 0 ? 'text-red-500' : 'text-white'}`}>{formatDisplayAmount(stack)}</p>
+          <p className="text-yellow-400 font-semibold text-xs h-4 capitalize flex items-center justify-center">
             {showHandStrength ? handResult.name : <span>&nbsp;</span>}
           </p>
           {isActive && !isFolded && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-cyan-400/50">
-                <div className="h-full bg-cyan-400 animate-timer-bar"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-800/50">
+                <div className="h-full bg-red-500 animate-timer-bar"></div>
                  <style>{`
                     @keyframes timer-bar {
                         from { width: 100%; }
@@ -79,19 +76,26 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, formatDisplay
                 `}</style>
             </div>
           )}
-        </div>
       </div>
+
+       {/* Action display */}
+       {lastActionDisplay && !isActive && (
+         <div className="absolute top-1/2 -right-4 bg-gray-900/80 text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg border border-gray-600">
+           {lastActionDisplay}
+         </div>
+       )}
 
       {/* Bet amount */}
       {bet > 0 && (
-        <div className="absolute top-[150px] bg-black/70 rounded-full px-3 py-1 text-sm font-bold text-yellow-300 border border-yellow-500">
-          {formatDisplayAmount(bet)}
+         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/60 p-1 pr-2.5 rounded-full border border-yellow-700 shadow-md">
+            <PokerChipIcon className="w-5 h-5 text-red-500" />
+            <span className="text-white text-xs font-bold font-mono">{formatDisplayAmount(bet)}</span>
         </div>
       )}
 
       {/* Dealer Chip */}
       {isDealer && (
-        <div className="absolute top-1/2 -right-5 transform -translate-y-1/2">
+        <div className="absolute top-[60%] -left-3 transform -translate-y-1/2">
             <DealerChipIcon className="w-6 h-6" />
         </div>
       )}
