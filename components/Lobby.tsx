@@ -74,7 +74,7 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
                 </div>
               )}
           </div>
-        </>
+        </div>
       );
     }
     if (gameTab === 'SLOTS') {
