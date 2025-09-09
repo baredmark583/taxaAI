@@ -1,5 +1,7 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { Suit, Rank, SlotSymbol } from '../types';
+
+const API_URL = (import.meta as any).env.VITE_API_URL;
 
 // Helper function to generate default card faces from a pattern
 const generateDefaultCardFaces = () => {
@@ -75,6 +77,32 @@ interface AssetProviderProps {
 
 export const AssetProvider: React.FC<AssetProviderProps> = ({ children }) => {
   const [assets, setAssets] = useState<GameAssets>(defaultAssets);
+
+  useEffect(() => {
+    const fetchAssets = async () => {
+      if (!API_URL) {
+        console.error("VITE_API_URL is not defined. Using default assets.");
+        return;
+      }
+      try {
+        const response = await fetch(`${API_URL}/api/assets`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch assets');
+        }
+        const data = await response.json();
+        if (data.cardFaces && data.cardBackUrl && data.slotSymbols && data.tableBackgroundUrl) {
+            setAssets(data);
+        } else {
+             console.error("Fetched asset data is incomplete. Using default assets.");
+        }
+      } catch (error) {
+        console.error('Error fetching assets:', error, 'Using default assets.');
+      }
+    };
+
+    fetchAssets();
+  }, []);
+
 
   return (
     <AssetContext.Provider value={{ assets, setAssets }}>

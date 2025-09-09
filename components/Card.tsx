@@ -26,7 +26,7 @@ const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted }) => {
   const imageUrl = revealed ? getCardImageUrl(card) : assets.cardBackUrl;
 
   return (
-    <div className={`w-16 h-24 bg-white rounded-lg shadow-lg transition-all duration-300 ${isHighlighted ? 'ring-4 ring-yellow-400 shadow-xl shadow-yellow-500/40 transform scale-105' : ''}`}>
+    <div className={`w-14 h-20 sm:w-16 sm:h-24 bg-white rounded-lg shadow-lg transition-all duration-300 ${isHighlighted ? 'ring-4 ring-yellow-400 shadow-xl shadow-yellow-500/40 transform scale-105' : ''}`}>
       <img 
         src={imageUrl} 
         alt={revealed ? `${card.rank} of ${card.suit}` : 'Card back'} 

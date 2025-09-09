@@ -147,7 +147,10 @@ const App: FC = () => {
         // Exclude wallets known to be tied to Telegram's regionally-restricted services.
         // FIX: Safely access `appName` to prevent crashes on malformed wallet entries.
         const filteredWallets = data.filter((wallet: any) => {
-            const appName = wallet?.appName?.toLowerCase() || '';
+            if (!wallet || typeof wallet.appName !== 'string') {
+                return false;
+            }
+            const appName = wallet.appName.toLowerCase();
             return !['wallet', 'telegram-wallet', 'tonspace'].includes(appName);
         });
         setWallets(filteredWallets);

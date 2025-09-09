@@ -29,7 +29,7 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
   return (
     <div className={`relative flex flex-col items-center transition-all duration-300 ${isFolded ? 'opacity-40' : ''}`}>
       {/* Player cards */}
-      <div className={`flex justify-center mb-1 h-24 ${cardContainerClass} ${cardScale}`}>
+      <div className={`flex justify-center mb-1 h-20 sm:h-24 ${cardContainerClass} ${cardScale}`}>
         {cards.length > 0 ? (
           <>
             <Card card={cards[0]} revealed={showHand} isHighlighted={isUser && cardIsPartOfHand(cards[0], handResult?.cards)} />
@@ -41,10 +41,10 @@ const Player: React.FC<PlayerProps> = ({ player, isUser, isActive, currency, for
       </div>
       
       {/* Player info box */}
-      <div className={`relative bg-black/40 backdrop-blur-sm border-2 rounded-lg px-3 py-1 shadow-md text-center w-32 overflow-hidden ${isActive ? 'border-cyan-400 scale-105 shadow-cyan-500/30' : 'border-gray-600/50'}`}>
-        <p className="text-white font-bold text-sm truncate">{name}</p>
-        <p className={`font-mono text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
-         <p className="text-yellow-400 font-semibold text-xs h-4 capitalize">
+      <div className={`relative bg-black/40 backdrop-blur-sm border-2 rounded-lg px-2 py-1 shadow-md text-center w-28 sm:w-32 overflow-hidden ${isActive ? 'border-cyan-400 scale-105 shadow-cyan-500/30' : 'border-gray-600/50'}`}>
+        <p className="text-white font-bold text-xs sm:text-sm truncate">{name}</p>
+        <p className={`font-mono text-base sm:text-lg ${stack === 0 ? 'text-red-500' : 'text-green-400'}`}>{currency}{formatCurrency(stack)}</p>
+         <p className="text-yellow-400 font-semibold text-[10px] sm:text-xs h-3 sm:h-4 capitalize">
             {(showHand && handResult && handResult.rank > -1) ? handResult.name : ''}
         </p>
         { isThinking && <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div> }

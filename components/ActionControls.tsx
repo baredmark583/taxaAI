@@ -67,10 +67,10 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
   }
 
   return (
-    <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center space-x-3">
+    <div className="w-full max-w-lg mt-4 p-2 flex flex-wrap justify-center items-center gap-2">
       <button
         onClick={() => onAction({ type: 'fold' })}
-        className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg shadow-lg shadow-red-500/20 transition-transform transform hover:scale-105"
+        className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold rounded-lg shadow-lg shadow-red-500/20 transition-transform transform hover:scale-105"
       >
         <FoldIcon className="w-5 h-5 mr-2" />
         <span>Fold</span>
@@ -79,14 +79,14 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       {canCheck ? (
         <button
           onClick={() => onAction({ type: 'check' })}
-          className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
         >
           Check
         </button>
       ) : (
         <button
           onClick={() => onAction({ type: 'call' })}
-          className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-transform transform hover:scale-105"
+          className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-transform transform hover:scale-105"
         >
           <CallIcon className="w-5 h-5 mr-2" />
           <span>Call {currency}{formatCurrency(toCall)}</span>
@@ -95,7 +95,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
 
       <button
         onClick={() => setIsBetting(true)}
-        className="flex items-center justify-center w-1/3 py-4 bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold rounded-lg shadow-lg shadow-green-500/20 transition-transform transform hover:scale-105"
+        className="flex items-center justify-center flex-grow basis-24 py-4 bg-gradient-to-b from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold rounded-lg shadow-lg shadow-green-500/20 transition-transform transform hover:scale-105"
       >
         <RaiseIcon className="w-5 h-5 mr-2" />
         <span>{currentBet > 0 ? 'Raise' : 'Bet'}</span>
