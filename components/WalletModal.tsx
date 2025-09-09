@@ -1,10 +1,6 @@
-
 import React, { useState } from 'react';
 import { useTonConnectUI, useTonWallet, TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
 
-// This is the club's treasury wallet address where deposits will be sent.
-// IMPORTANT: Replace this with your own REAL wallet address for a live application.
-// This is a sample TESTNET address. Do not send real TON to it.
 const TREASURY_WALLET_ADDRESS = "UQARnCdfRw0VcT86ApqHJEdMGzQU3T_MnPbNs71A6nOXcF91";
 
 interface WalletModalProps {
@@ -37,25 +33,18 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
     setError('');
     setIsLoading(true);
 
-    // The transaction object required by TON Connect
     const transaction = {
-      validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
+      validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
       messages: [
         {
           address: TREASURY_WALLET_ADDRESS,
-          // Amount in nanotons (1 TON = 1,000,000,000 nanotons)
           amount: (numericAmount * 1_000_000_000).toString(),
         },
       ],
     };
 
     try {
-      // Send the transaction to the user's wallet for confirmation
       await tonConnectUI.sendTransaction(transaction);
-
-      // IMPORTANT: In a real app, you don't credit the user's balance here.
-      // You wait for a backend service to confirm the transaction on the blockchain
-      // and then update the user's balance. This is for UI feedback only.
       alert('Транзакция отправлена! Баланс будет обновлен после подтверждения в сети TON.');
       resetAndClose();
     } catch (err) {
@@ -77,7 +66,7 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
     if (!wallet) {
       return (
         <div className="text-center">
-          <p className="text-gray-300 mb-6">
+          <p className="text-text-secondary mb-6">
             Подключите ваш кошелек TON, чтобы пополнить баланс.
           </p>
           <div className="flex justify-center">
@@ -89,15 +78,15 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
 
     return (
       <div>
-        <div className="bg-gray-900 p-3 rounded-lg mb-4 text-center">
-            <p className="text-xs text-gray-400">Подключен кошелек:</p>
-            <p className="text-sm font-mono text-cyan-400 break-all">{userFriendlyAddress}</p>
+        <div className="bg-background-dark p-3 rounded-lg mb-4 text-center">
+            <p className="text-xs text-text-secondary">Подключен кошелек:</p>
+            <p className="text-sm font-mono text-primary-accent break-all">{userFriendlyAddress}</p>
         </div>
-        <p className="text-sm text-gray-400 mb-4">
-          Введите сумму в TON для пополнения. Вам будет предложено подтвердить транзакцию.
+        <p className="text-sm text-text-secondary mb-4">
+          Введите сумму в TON для пополнения.
         </p>
         <div className="mb-4">
-          <label htmlFor="deposit-amount" className="block text-sm font-medium text-gray-300 mb-2">
+          <label htmlFor="deposit-amount" className="block text-sm font-medium text-text-secondary mb-2">
             Сумма (TON)
           </label>
           <div className="relative">
@@ -107,17 +96,17 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="e.g., 10"
-              className="w-full bg-gray-900 text-white border border-gray-600 rounded-lg px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full bg-background-dark text-white border border-brand-border rounded-lg px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-primary-accent"
               disabled={isLoading}
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">TON</span>
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary">TON</span>
           </div>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          {error && <p className="text-danger text-sm mt-2">{error}</p>}
         </div>
         <button
           onClick={handleDeposit}
           disabled={isLoading}
-          className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
+          className="w-full bg-primary-accent hover:bg-primary-accent/80 text-black font-bold py-3 rounded-lg transition-colors flex items-center justify-center disabled:bg-gray-500 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -134,16 +123,16 @@ const WalletModal: React.FC<WalletModalProps> = ({ isOpen, onClose, currentBalan
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md border border-gray-700 transform transition-all duration-300 scale-100 animate-fade-in">
+    <div className="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-background-light rounded-2xl shadow-2xl w-full max-w-md border border-brand-border transform transition-all duration-300 scale-100">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-white">Управление кошельком</h2>
-            <button onClick={resetAndClose} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
+            <button onClick={resetAndClose} className="text-text-secondary hover:text-white text-3xl leading-none">&times;</button>
           </div>
-          <div className="bg-gray-900 p-4 rounded-lg mb-6">
-            <p className="text-sm text-gray-400">Текущий баланс в игре</p>
-            <p className="text-3xl font-mono text-cyan-400">{currentBalance.toFixed(4)} TON</p>
+          <div className="bg-background-dark p-4 rounded-lg mb-6">
+            <p className="text-sm text-text-secondary">Текущий баланс в игре</p>
+            <p className="text-3xl font-mono text-primary-accent">{currentBalance.toFixed(4)} TON</p>
           </div>
           {renderContent()}
         </div>

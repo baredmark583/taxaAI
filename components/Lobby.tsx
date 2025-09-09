@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { GameMode, TableConfig } from '../types';
 import WalletModal from './WalletModal';
@@ -32,47 +31,45 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
   const currencySymbol = moneyTab === GameMode.REAL_MONEY ? 'TON' : '$';
   const balance = moneyTab === GameMode.REAL_MONEY ? realMoneyBalance.toFixed(4) : playMoneyBalance.toLocaleString();
   
-  const gameTabClass = (tabName: string) => `flex items-center space-x-2 px-4 py-2 rounded-md transition-colors text-sm font-semibold ${gameTab === tabName ? 'bg-cyan-600 text-white' : 'bg-gray-800 hover:bg-gray-600'}`;
+  const gameTabClass = (tabName: string) => `flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-sm font-semibold transform hover:scale-105 ${gameTab === tabName ? 'bg-primary-accent/20 text-primary-accent border border-primary-accent/50 shadow-glow-primary' : 'bg-surface/50 hover:bg-surface'}`;
 
 
   const renderContent = () => {
     if (gameTab === 'POKER') {
       return (
-        <>
-          {/* Header with Money Tabs and Balance */}
-          <div className="flex justify-between items-center p-4 border-b border-t border-gray-700">
-              <div className="flex border border-gray-600 rounded-lg">
-                  <button onClick={() => setMoneyTab(GameMode.REAL_MONEY)} className={`px-4 py-2 rounded-l-md transition-colors ${moneyTab === GameMode.REAL_MONEY ? 'bg-cyan-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>Real Money</button>
-                  <button onClick={() => setMoneyTab(GameMode.PLAY_MONEY)} className={`px-4 py-2 rounded-r-md transition-colors ${moneyTab === GameMode.PLAY_MONEY ? 'bg-purple-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>Play Money</button>
+        <div className="animate-fade-in">
+          <div className="flex justify-between items-center p-4 border-b border-t border-brand-border">
+              <div className="flex border border-brand-border rounded-lg overflow-hidden">
+                  <button onClick={() => setMoneyTab(GameMode.REAL_MONEY)} className={`px-4 py-2 transition-colors font-semibold ${moneyTab === GameMode.REAL_MONEY ? 'bg-primary-accent text-black' : 'bg-surface hover:bg-background-light'}`}>Real Money</button>
+                  <button onClick={() => setMoneyTab(GameMode.PLAY_MONEY)} className={`px-4 py-2 transition-colors font-semibold ${moneyTab === GameMode.PLAY_MONEY ? 'bg-gold-accent text-black' : 'bg-surface hover:bg-background-light'}`}>Play Money</button>
               </div>
               <div className="text-right">
-                  <p className="text-gray-400 text-sm">Balance</p>
-                  <p className="text-white font-mono text-lg">{balance} {currencySymbol}</p>
+                  <p className="text-text-secondary text-sm">Balance</p>
+                  <p className="text-text-primary font-mono text-lg">{balance} {currencySymbol}</p>
               </div>
           </div>
           
-          {/* Table List */}
-          <div className="p-4 space-y-3 max-h-[50vh] overflow-y-auto">
+          <div className="p-4 space-y-3 max-h-[calc(100vh-22rem)] overflow-y-auto">
               {tablesToShow.length > 0 ? tablesToShow.map(table => (
-                  <div key={table.id} className="grid grid-cols-4 items-center bg-gray-900/50 p-3 rounded-lg hover:bg-gray-700/50 transition-colors">
-                      <div className="col-span-2">
-                          <p className="font-bold text-white">{table.name}</p>
-                          <p className="text-sm text-gray-400">No-Limit Hold'em</p>
+                  <div key={table.id} className="grid grid-cols-12 items-center bg-surface/50 p-3 rounded-lg hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
+                      <div className="col-span-6">
+                          <p className="font-bold text-text-primary">{table.name}</p>
+                          <p className="text-sm text-text-secondary">No-Limit Hold'em</p>
                       </div>
-                      <div className="text-center">
-                          <p className="font-mono text-cyan-400">{currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}</p>
-                          <p className="text-xs text-gray-500">Stakes</p>
+                      <div className="col-span-3 text-center">
+                          <p className="font-mono text-primary-accent">{currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}</p>
+                          <p className="text-xs text-text-secondary">Stakes</p>
                       </div>
-                      <div className="flex justify-end space-x-4 items-center">
+                      <div className="col-span-3 flex justify-end space-x-4 items-center">
                           <div className="flex items-center space-x-1">
-                              <UsersIcon className="w-5 h-5 text-gray-400" />
-                              <span className="font-mono text-white">{table.players}/{table.maxPlayers}</span>
+                              <UsersIcon className="w-5 h-5 text-text-secondary" />
+                              <span className="font-mono text-text-primary">{table.players}/{table.maxPlayers}</span>
                           </div>
-                          <button onClick={() => onEnterPoker(table)} className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-md text-sm">Join</button>
+                          <button onClick={() => onEnterPoker(table)} className="bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success">Join</button>
                       </div>
                   </div>
               )) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-text-secondary">
                   <p>No tables available for this mode.</p>
                 </div>
               )}
@@ -82,21 +79,21 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
     }
     if (gameTab === 'SLOTS') {
       return (
-        <div className="text-center p-8 flex flex-col items-center justify-center min-h-[40vh]">
-            <SlotMachineIcon className="w-24 h-24 text-purple-400 mb-4" />
-            <h3 className="text-2xl font-bold mb-2">Crypto Slots</h3>
-            <p className="text-gray-400 mb-6 max-w-sm">Classic slot machine fun with a crypto twist. Match symbols like Bitcoin, Ethereum, and Diamonds to win big!</p>
-            <button onClick={onEnterSlots} className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 rounded-md text-lg transition-transform transform hover:scale-105">Play Now</button>
+        <div className="text-center p-8 flex flex-col items-center justify-center min-h-[40vh] animate-fade-in">
+            <SlotMachineIcon className="w-24 h-24 text-gold-accent mb-4" />
+            <h3 className="text-3xl font-bold mb-2">Crypto Slots</h3>
+            <p className="text-text-secondary mb-6 max-w-sm">Classic slot machine fun with a crypto twist. Match symbols to win big!</p>
+            <button onClick={onEnterSlots} className="bg-gold-accent/80 hover:bg-gold-accent text-black font-bold px-8 py-3 rounded-md text-lg transition-transform transform hover:scale-105 shadow-md hover:shadow-glow-gold">Play Now</button>
         </div>
       );
     }
     if (gameTab === 'ROULETTE') {
       return (
-         <div className="text-center p-8 flex flex-col items-center justify-center min-h-[40vh]">
-            <RouletteIcon className="w-24 h-24 text-red-500 mb-4" />
-            <h3 className="text-2xl font-bold mb-2">Crypto Roulette</h3>
-            <p className="text-gray-400 mb-6 max-w-sm">Place your bets and spin the wheel! A classic casino game of chance. Will it land on your lucky number?</p>
-            <button onClick={onEnterRoulette} className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-md text-lg transition-transform transform hover:scale-105">Play Now</button>
+         <div className="text-center p-8 flex flex-col items-center justify-center min-h-[40vh] animate-fade-in">
+            <RouletteIcon className="w-24 h-24 text-danger mb-4" />
+            <h3 className="text-3xl font-bold mb-2">Crypto Roulette</h3>
+            <p className="text-text-secondary mb-6 max-w-sm">Place your bets and spin the wheel! Will it land on your lucky number?</p>
+            <button onClick={onEnterRoulette} className="bg-danger/80 hover:bg-danger text-white font-bold px-8 py-3 rounded-md text-lg transition-transform transform hover:scale-105 shadow-md hover:shadow-glow-danger">Play Now</button>
         </div>
       );
     }
@@ -104,17 +101,17 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 font-sans">
-      <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold text-white tracking-wider">
-          CRYPTO POKER <span className="text-cyan-400">CLUB</span>
+    <div className="min-h-screen bg-background-dark flex flex-col items-center justify-center p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark">
+      <div className="text-center mb-8 animate-slide-up">
+        <h1 className="text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-primary-accent drop-shadow-[0_0_15px_rgba(0,224,255,0.4)]">
+          CRYPTO POKER CLUB
         </h1>
-        <p className="text-gray-400 mt-2">The ultimate Texas Hold'em experience on Telegram.</p>
+        <p className="text-text-secondary mt-2">The ultimate Texas Hold'em experience on Telegram.</p>
       </div>
 
-      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg border border-gray-700">
-        <div className="flex justify-center p-2 bg-gray-900/50 rounded-t-xl">
-          <div className="flex space-x-2 bg-gray-700 p-1 rounded-lg">
+      <div className="w-full max-w-4xl bg-background-light rounded-xl shadow-2xl border border-brand-border animate-slide-up animation-delay-200">
+        <div className="flex justify-center p-2 bg-black/30 rounded-t-xl">
+          <div className="flex space-x-2 bg-background-dark p-1 rounded-lg">
               <button onClick={() => setGameTab('POKER')} className={gameTabClass('POKER')}>
                 <PokerChipIcon className="w-5 h-5" />
                 <span>Poker</span>
@@ -133,10 +130,10 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
         {renderContent()}
       </div>
       
-      <div className="text-center mt-6 flex space-x-4">
+      <div className="text-center mt-6 animate-fade-in animation-delay-400">
             <button
                 onClick={() => setIsWalletOpen(true)}
-                className="text-cyan-400 hover:text-cyan-300 font-semibold py-2 px-4 rounded-lg transition-colors duration-300"
+                className="text-primary-accent hover:text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-primary-accent/10"
             >
                 Manage Crypto Wallet
             </button>

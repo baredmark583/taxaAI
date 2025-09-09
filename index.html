@@ -11,10 +11,38 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+      :root {
+        --background-dark: #0D0D0D;
+        --background-light: #1A1A1A;
+        --surface-color: #1F1F1F;
+        --border-color: #333333;
+        --primary-accent: #00E0FF; /* Cyan */
+        --gold-accent: #FFD700;
+        --text-primary: #FFFFFF;
+        --text-secondary: #A0A0A0;
+        --danger-color: #FF4141;
+        --warning-color: #FFA500;
+        --success-color: #00FF7F;
+      }
       body {
+        background-color: var(--background-dark);
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        font-family: 'Inter', sans-serif;
+        overflow: hidden; /* Prevent scrollbars on main body */
+      }
+      /* Custom scrollbar for a more integrated feel */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--background-light);
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: var(--primary-accent);
+        border-radius: 4px;
+        border: 2px solid var(--background-light);
       }
     </style>
   <script type="importmap">
@@ -77,16 +105,49 @@
     tailwind.config = {
       theme: {
         extend: {
+          colors: {
+            'background-dark': 'var(--background-dark)',
+            'background-light': 'var(--background-light)',
+            'surface': 'var(--surface-color)',
+            'primary-accent': 'var(--primary-accent)',
+            'gold-accent': 'var(--gold-accent)',
+            'text-primary': 'var(--text-primary)',
+            'text-secondary': 'var(--text-secondary)',
+            'danger': 'var(--danger-color)',
+            'warning': 'var(--warning-color)',
+            'success': 'var(--success-color)',
+            'brand-border': 'var(--border-color)',
+          },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
           },
+          boxShadow: {
+            'glow-primary': '0 0 15px 0px var(--primary-accent)',
+            'glow-gold': '0 0 15px 0px var(--gold-accent)',
+            'glow-danger': '0 0 15px 0px var(--danger-color)',
+            'glow-success': '0 0 15px 0px var(--success-color)',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out forwards',
+            'slide-up': 'slideUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+            slideUp: {
+              '0%': { opacity: 0, transform: 'translateY(20px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' },
+            }
+          }
         },
       },
     }
   </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gray-900 text-white">
+  <body class="bg-background-dark text-text-primary">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -48,26 +48,26 @@ interface AssetContextType {
 
 // Default asset values
 const defaultAssets: GameAssets = {
-  cardBackUrl: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg',
-  tableBackgroundUrl: 'https://img.freepik.com/premium-photo/poker-table-background_87394-8438.jpg',
+  cardBackUrl: 'https://www.svgrepo.com/show/424339/poker-gambling-game.svg',
+  tableBackgroundUrl: 'https://i.imgur.com/Q9x2s70.png',
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
-  // Default Icons
-  iconFavicon: 'https://api.iconify.design/icon-park/poker.svg',
-  iconManifest: 'https://api.iconify.design/icon-park/poker.svg',
+  // Default Icons - updated for a sleeker look
+  iconFavicon: 'https://api.iconify.design/mdi/poker-chip.svg',
+  iconManifest: 'https://api.iconify.design/mdi/poker-chip.svg',
   iconCrypto: 'https://api.iconify.design/ph/currency-ton-bold.svg',
-  iconPlayMoney: 'https://api.iconify.design/ion/cash-outline.svg',
+  iconPlayMoney: 'https://api.iconify.design/solar/money-bag-bold-duotone.svg',
   iconExit: 'https://api.iconify.design/solar/logout-3-linear.svg',
   iconSettings: 'https://api.iconify.design/solar/settings-linear.svg',
-  iconUsers: 'https://api.iconify.design/ph/users-three.svg',
-  iconDealerChip: 'https://api.iconify.design/mdi/letter-d-box.svg',
-  iconPokerChip: 'https://api.iconify.design/icon-park/poker.svg',
-  iconSlotMachine: 'https://api.iconify.design/mdi/slot-machine.svg',
+  iconUsers: 'https://api.iconify.design/solar/users-group-rounded-linear.svg',
+  iconDealerChip: 'https://api.iconify.design/mdi/alpha-d-circle.svg',
+  iconPokerChip: 'https://api.iconify.design/mdi/poker-chip.svg',
+  iconSlotMachine: 'https://api.iconify.design/solar/slot-machine-bold-duotone.svg',
   iconRoulette: 'https://api.iconify.design/mdi/roulette.svg',
   iconFold: 'https://api.iconify.design/mdi/hand-back-right-off-outline.svg',
   iconCall: 'https://api.iconify.design/mdi/check.svg',
-  iconRaise: 'https://api.iconify.design/mdi/arrow-up-bold.svg',
+  iconRaise: 'https://api.iconify.design/mdi/arrow-up-bold-box-outline.svg',
 };
 
 // Create the context

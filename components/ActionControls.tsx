@@ -45,12 +45,12 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
     const actualBetAmount = Math.max(minBet, Math.min(betAmount, maxBet));
 
     return (
-        <div className="w-full max-w-lg mt-4 p-3 bg-black/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
+        <div className="w-full max-w-lg mt-4 p-3 bg-black/60 backdrop-blur-md border border-brand-border rounded-lg shadow-lg flex flex-col items-center animate-fade-in">
             <div className="flex justify-between w-full mb-3 text-sm">
-                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.5), maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">1/2 Pot</button>
-                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.75), maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">3/4 Pot</button>
-                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(pot, maxBet)))} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">Pot</button>
-                <button onClick={() => setBetAmount(maxBet)} className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">All-In</button>
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.5), maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">1/2 Pot</button>
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.75), maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">3/4 Pot</button>
+                <button onClick={() => setBetAmount(Math.max(minBet, Math.min(pot, maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">Pot</button>
+                <button onClick={() => setBetAmount(maxBet)} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">All-In</button>
             </div>
             <input 
                 type="range" 
@@ -59,15 +59,15 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
                 step={smallBlind}
                 value={actualBetAmount}
                 onChange={handleBetChange}
-                className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer range-sm accent-green-500"
+                className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer range-sm accent-success"
             />
-             <div className="flex justify-between w-full text-xs text-gray-400 px-1 mt-1 font-mono">
+             <div className="flex justify-between w-full text-xs text-text-secondary px-1 mt-1 font-mono">
                 <span>{formatDisplayAmount(minBet)}</span>
                 <span>{formatDisplayAmount(maxBet)}</span>
             </div>
             <div className="flex items-center justify-between w-full space-x-4 mt-4">
-                <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold flex-1">Cancel</button>
-                <button onClick={handleBetAction} className="px-6 py-3 bg-green-600 hover:bg-green-500 rounded-lg text-white font-bold text-lg shadow-lg shadow-green-500/20 flex-1">
+                <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold flex-1 transition-transform transform hover:scale-105">Cancel</button>
+                <button onClick={handleBetAction} className="px-6 py-3 bg-gradient-to-b from-success/90 to-success text-black rounded-lg text-white font-bold text-lg shadow-lg shadow-success/20 hover:shadow-glow-success flex-1 transition-all transform hover:scale-105">
                     Raise to {formatDisplayAmount(actualBetAmount)}
                 </button>
             </div>
@@ -79,7 +79,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
     <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center gap-2">
       <button
         onClick={() => onAction({ type: 'fold' })}
-        className="flex-1 py-4 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
+        className="flex-1 py-4 bg-gradient-to-b from-danger/80 to-danger text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase hover:shadow-glow-danger"
       >
         Fold
       </button>
@@ -87,14 +87,14 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       {canCheck ? (
         <button
           onClick={() => onAction({ type: 'check' })}
-          className="flex-1 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
+          className="flex-1 py-4 bg-gradient-to-b from-warning/80 to-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
         >
           Check
         </button>
       ) : (
         <button
           onClick={() => onAction({ type: 'call' })}
-          className="flex-1 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase"
+          className="flex-1 py-4 bg-gradient-to-b from-warning/80 to-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
         >
           Call {toCall > 0 ? formatDisplayAmount(toCall) : ''}
         </button>
@@ -103,14 +103,14 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       <button
         onClick={() => { setBetAmount(minRaise); handleBetAction(); }}
         disabled={minRaise > player.stack + player.bet}
-        className="flex-1 py-4 bg-green-700 hover:bg-green-600 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105 uppercase disabled:bg-gray-600 disabled:opacity-50 disabled:scale-100"
+        className="flex-1 py-4 bg-gradient-to-b from-success/80 to-success text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase disabled:from-gray-600 disabled:to-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
       >
         {currentBet > 0 ? `Raise ${formatDisplayAmount(minRaise)}` : `Bet ${formatDisplayAmount(minRaise)}`}
       </button>
 
        <button
         onClick={() => { setBetAmount(minRaise); setIsBetting(true); }}
-        className="p-4 bg-green-900 hover:bg-green-800 text-white font-bold rounded-lg shadow-lg transition-transform transform hover:scale-105"
+        className="p-4 bg-gradient-to-b from-green-900 to-green-800 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105"
       >
         <RaiseIcon className="w-6 h-6" />
       </button>

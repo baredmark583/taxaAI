@@ -20,7 +20,7 @@ const CommunityCards: React.FC<CommunityCardsProps> = ({ cards, phase, highlight
   const communityPartOfHand = renderedCards.filter(rc => cardIsHighlighted(rc, highlightedCards));
 
   return (
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-2 z-0">
+    <div className="flex space-x-2">
       {renderedCards.length > 0 ? (
         renderedCards.map((card, index) => (
           <div key={`${card.rank}-${card.suit}-${index}`} className="transform scale-90">
