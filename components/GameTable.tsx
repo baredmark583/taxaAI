@@ -93,16 +93,16 @@ const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGo
   const otherPlayers = players.filter(p => p.id !== userId);
   const currency = table.mode === GameMode.REAL_MONEY ? 'TON' : '$';
   
-  const formatDisplayAmount = useCallback((amount: number) => {
-      if (userSettings.showInBB && bigBlind > 0) {
-          const amountInBB = amount / bigBlind;
-          return `${amountInBB.toFixed(1)} ББ`;
-      }
-      if (table.mode === GameMode.REAL_MONEY) {
-          return `${currency}${amount.toFixed(4)}`;
-      }
-      return `${currency}${amount.toLocaleString()}`;
-  }, [userSettings.showInBB, bigBlind, table.mode, currency]);
+  const formatDisplayAmount = (amount: number) => {
+    if (userSettings.showInBB && bigBlind > 0) {
+      const amountInBB = amount / bigBlind;
+      return `${amountInBB.toFixed(1)} ББ`;
+    }
+    if (table.mode === GameMode.REAL_MONEY) {
+      return `${currency}${amount.toFixed(4)}`;
+    }
+    return `${currency}${amount.toLocaleString()}`;
+  };
 
   const userHandCards = userPlayer?.handResult?.cards || [];
 
