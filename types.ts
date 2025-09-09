@@ -1,5 +1,6 @@
 
 
+
 export enum Suit {
   HEARTS = 'HEARTS',
   DIAMONDS = 'DIAMONDS',
@@ -32,6 +33,7 @@ export interface HandResult {
   name: string;
   rank: number;
   cards: Card[];
+  rankValues?: number[];
 }
 
 export interface Player {
@@ -125,4 +127,30 @@ export interface SlotSymbol {
   imageUrl: string;
   payout: number;
   weight: number;
+}
+
+// For asset context
+export interface IconAssets {
+    iconFavicon: string;
+    iconManifest: string;
+    iconCrypto: string;
+    iconPlayMoney: string;
+    iconExit: string;
+    iconSettings: string;
+    iconUsers: string;
+    iconDealerChip: string;
+    iconPokerChip: string;
+    iconSlotMachine: string;
+    iconRoulette: string;
+    iconFold: string;
+    iconCall: string;
+    iconRaise: string;
+}
+
+export interface GameAssets extends IconAssets {
+  cardBackUrl: string;
+  tableBackgroundUrl: string;
+  godModePassword: string;
+  cardFaces: { [suit in Suit]: { [rank in Rank]: string } };
+  slotSymbols: SlotSymbol[];
 }

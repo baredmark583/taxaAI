@@ -14,6 +14,7 @@ interface PlayerProps {
 }
 
 const cardIsPartOfHand = (card: CardType, handCards: CardType[] = []) => {
+    if (!handCards) return false;
     return handCards.some(handCard => handCard.rank === card.rank && handCard.suit === card.suit);
 }
 

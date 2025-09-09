@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useCallback, useEffect, FC } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -19,6 +20,8 @@ interface TelegramUser {
 }
 
 const ADMIN_TELEGRAM_ID = 7327258482;
+const API_URL = (import.meta as any).env.VITE_API_URL;
+
 
 const TelegramFlow: FC = () => {
   const [activeGame, setActiveGame] = useState<ActiveGame>('LOBBY');
@@ -172,8 +175,8 @@ const App: FC = () => {
     );
   }
 
-  // FIX: Provide an absolute URL for the manifest to ensure TonConnect can always find it.
-  const manifestUrl = new URL('/tonconnect-manifest.json', window.location.origin).href;
+  // Point to the dynamic manifest served by our backend
+  const manifestUrl = `${API_URL}/api/tonconnect-manifest.json`;
 
   return (
     <TonConnectUIProvider 

@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
-import { Suit, Rank, SlotSymbol } from '../types';
+import { Suit, Rank, SlotSymbol, GameAssets } from '../types';
 
 const API_URL = (import.meta as any).env.VITE_API_URL;
 
@@ -40,15 +40,6 @@ const defaultSlotSymbols: SlotSymbol[] = [
     { id: 4, name: 'CHERRY', imageUrl: 'https://www.svgrepo.com/show/198816/slot-machine-casino.svg', payout: 10, weight: 4 },
 ];
 
-// Define the shape of your assets
-interface GameAssets {
-  cardBackUrl: string;
-  tableBackgroundUrl: string;
-  godModePassword: string;
-  cardFaces: { [suit in Suit]: { [rank in Rank]: string } };
-  slotSymbols: SlotSymbol[];
-}
-
 // Define the context type
 interface AssetContextType {
   assets: GameAssets;
@@ -62,6 +53,21 @@ const defaultAssets: GameAssets = {
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
+  // Default Icons
+  iconFavicon: 'https://api.iconify.design/icon-park/poker.svg',
+  iconManifest: 'https://api.iconify.design/icon-park/poker.svg',
+  iconCrypto: 'https://api.iconify.design/ph/currency-ton-bold.svg',
+  iconPlayMoney: 'https://api.iconify.design/ion/cash-outline.svg',
+  iconExit: 'https://api.iconify.design/solar/logout-3-linear.svg',
+  iconSettings: 'https://api.iconify.design/solar/settings-linear.svg',
+  iconUsers: 'https://api.iconify.design/ph/users-three.svg',
+  iconDealerChip: 'https://api.iconify.design/mdi/letter-d-box.svg',
+  iconPokerChip: 'https://api.iconify.design/icon-park/poker.svg',
+  iconSlotMachine: 'https://api.iconify.design/icon-park/slot-machine.svg',
+  iconRoulette: 'https://api.iconify.design/icon-park/roulette.svg',
+  iconFold: 'https://api.iconify.design/mdi/hand-back-right-off-outline.svg',
+  iconCall: 'https://api.iconify.design/mdi/check.svg',
+  iconRaise: 'https://api.iconify.design/mdi/arrow-up-bold.svg',
 };
 
 // Create the context
@@ -90,8 +96,12 @@ export const AssetProvider: React.FC<AssetProviderProps> = ({ children }) => {
           throw new Error('Failed to fetch assets');
         }
         const data = await response.json();
-        if (data.cardFaces && data.cardBackUrl && data.slotSymbols && data.tableBackgroundUrl) {
+        if (data.cardFaces && data.cardBackUrl && data.iconFavicon) {
             setAssets(data);
+            const favicon = document.getElementById('favicon') as HTMLLinkElement | null;
+            if (favicon) {
+                favicon.href = data.iconFavicon;
+            }
         } else {
              console.error("Fetched asset data is incomplete. Using default assets.");
         }
