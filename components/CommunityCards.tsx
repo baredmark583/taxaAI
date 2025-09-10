@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card as CardType, GameStage, Suit, Rank } from '../types';
 import Card from './Card';
@@ -26,7 +27,7 @@ const CommunityCards: React.FC<CommunityCardsProps> = ({ cards, stage, winningHa
   }
 
   return (
-    <div className="flex justify-center items-center space-x-2 my-4 h-24">
+    <div className="flex justify-center items-center space-x-1 sm:space-x-2 my-4 h-24">
       {paddedCards.map((card, index) => (
         <div key={index} className={`transition-all duration-500 ${index < revealedCount ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
            <Card 

@@ -36,7 +36,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
   };
   
   if (!isActive || player.isFolded || player.isAllIn) {
-    return <div className="h-[80px] mt-4" />;
+    return null;
   }
   
   if (isBetting) {

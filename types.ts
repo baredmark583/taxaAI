@@ -112,3 +112,10 @@ export interface GameAssets extends IconAssets {
   cardFaces: { [suit in Suit]?: { [rank in Rank]?: string } };
   slotSymbols: SlotSymbol[];
 }
+
+export interface HandResult {
+    rank: number;
+    name: string;
+    value: number;
+    cards: Card[];
+}

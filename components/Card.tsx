@@ -29,7 +29,7 @@ const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted, overrideBack
 
   const sizeClasses = size === 'small'
     ? 'w-10 h-14'
-    : 'w-14 h-20 sm:w-16 sm:h-24';
+    : 'w-12 h-[72px] sm:w-14 sm:h-[98px] md:w-16 md:h-24';
 
   return (
     <div className={`${sizeClasses} bg-white rounded-lg shadow-lg transition-all duration-300 ${isHighlighted ? 'ring-2 ring-gold-accent shadow-glow-gold transform scale-105' : ''}`}>
