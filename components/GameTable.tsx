@@ -9,13 +9,18 @@ import WinnerAnnouncement from './WinnerAnnouncement';
 import { ExitIcon, SettingsIcon } from './Icons';
 import { AssetContext } from '../contexts/AssetContext';
 import { evaluatePlayerHand } from '../utils/pokerEvaluator';
-import HandStrengthIndicator from './HandStrengthIndicator';
-
 
 interface GameTableProps {
   table: TableConfig;
   onExit: () => void;
 }
+
+const PotDisplay: React.FC<{ amount: number; format: (amount: number) => string }> = ({ amount, format }) => (
+    <div className="flex flex-col items-center text-center -translate-y-2 sm:-translate-y-4">
+        <p className="text-sm font-bold text-gold-accent uppercase tracking-wider">Pot</p>
+        <p className="text-xl sm:text-2xl font-bold text-white font-mono drop-shadow-lg">{format(amount)}</p>
+    </div>
+);
 
 const getOpponentPositions = (numOpponents: number) => {
     const positions: React.CSSProperties[] = [];
@@ -89,26 +94,36 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
 
   return (
     <div className="relative w-full h-full bg-cover bg-center text-white overflow-hidden flex flex-col" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}>
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/60" />
         
         {/* Header */}
         <header className="relative z-20 w-full flex justify-between items-start p-2 sm:p-4">
-            <button onClick={onExit} className="flex items-center space-x-2 px-3 py-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors text-sm"><ExitIcon/><span>Lobby</span></button>
-            <div className="text-center bg-black/50 px-4 py-1 rounded-b-lg">
+            <button onClick={onExit} className="flex items-center space-x-2 px-3 py-2 bg-black/60 hover:bg-black/80 rounded-lg transition-colors text-sm shadow-lg"><ExitIcon/><span>Lobby</span></button>
+            <div className="text-center bg-black/60 px-4 py-1 rounded-b-lg shadow-lg">
                 <h1 className="text-lg font-bold">{table.name}</h1>
                 <p className="text-xs text-text-secondary">{table.mode === GameMode.REAL_MONEY ? 'Real Money' : 'Play Money'} - {formatDisplayAmount(table.stakes.small)}/{formatDisplayAmount(table.stakes.big)}</p>
             </div>
-            <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors"><SettingsIcon/></button>
+            <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-black/60 hover:bg-black/80 rounded-lg transition-colors shadow-lg"><SettingsIcon/></button>
         </header>
 
         {/* Main Game Area */}
         <main className="relative flex-grow flex items-center justify-center min-h-0">
           <div className="relative w-full h-full max-h-[calc(100vw*0.6)] sm:max-h-full max-w-full sm:max-w-[120vh] aspect-[16/10]">
-              <div className="absolute inset-[5%] sm:inset-[10%] border-4 border-yellow-800/50 bg-green-900/70 rounded-full">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-max">
-                      <CommunityCards cards={state.communityCards} stage={state.stage} winningHand={highlightedCards} />
-                      <p className="text-lg font-bold bg-black/50 px-3 py-1 rounded-full whitespace-nowrap">Pot: {formatDisplayAmount(state.pot)}</p>
+              
+               <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-[95%] h-[95%]">
+                      {/* Table Railing */}
+                      <div className="absolute inset-0 bg-yellow-900/80 rounded-full shadow-2xl" />
+                      {/* Table Felt */}
+                      <div className="absolute inset-[3%] sm:inset-[4%] poker-felt rounded-full shadow-inner" />
+                      {/* Inner Line */}
+                      <div className="absolute inset-[4%] sm:inset-[5%] border-2 border-yellow-700/50 rounded-full pointer-events-none" />
                   </div>
+              </div>
+
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center w-max z-10">
+                  <CommunityCards cards={state.communityCards} stage={state.stage} winningHand={highlightedCards} />
+                  {state.pot > 0 && <PotDisplay amount={state.pot} format={formatDisplayAmount} />}
               </div>
 
               {opponents.map((player, index) => {
@@ -116,7 +131,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
                   const pos = opponentPositions[index];
                   const winnerInfo = state.winners?.find(w => w.playerId === player.id);
                   return (
-                      <div key={player.id} className="absolute" style={pos}>
+                      <div key={player.id} className="absolute z-20" style={pos}>
                           <Player 
                               player={player} 
                               isDealer={playerIndexInFullList === state.dealerIndex} 
@@ -134,7 +149,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
               })}
 
               {mainPlayer && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[28%] sm:translate-y-[20%]">
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[28%] sm:translate-y-[20%] z-20">
                        <Player 
                           player={mainPlayer} 
                           isDealer={mainPlayerIndex === state.dealerIndex}
@@ -146,6 +161,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
                           winningHand={highlightedCards}
                           stage={state.stage}
                           amountWon={state.winners?.find(w => w.playerId === mainPlayer.id)?.amountWon}
+                          bestHandName={bestHand?.name}
                        />
                   </div>
               )}
@@ -153,7 +169,6 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
         </main>
 
         <footer className="relative z-20 w-full flex flex-col items-center p-2">
-            {bestHand && <HandStrengthIndicator handName={bestHand.name} />}
             <div className="h-[96px] w-full flex items-center justify-center">
                 {mainPlayer && <ActionControls 
                     player={mainPlayer} 

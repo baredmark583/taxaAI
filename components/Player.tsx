@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Player as PlayerType, Card as CardType, GameStage } from '../types';
 import Card from './Card';
 import { DealerChipIcon } from './Icons';
+import { cn } from '@/lib/utils';
+import { AssetContext } from '../contexts/AssetContext';
+
 
 interface PlayerProps {
   player: PlayerType;
@@ -14,6 +17,7 @@ interface PlayerProps {
   winningHand?: CardType[];
   stage: GameStage;
   amountWon?: number;
+  bestHandName?: string;
 }
 
 const PlayerAvatar: React.FC<{ player: PlayerType }> = ({ player }) => {
@@ -30,8 +34,33 @@ const PlayerAvatar: React.FC<{ player: PlayerType }> = ({ player }) => {
     );
 };
 
+const PlayerTimer: React.FC<{ isActive: boolean }> = ({ isActive }) => {
+  if (!isActive) return null;
 
-const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode, cardBackUrl, formatDisplayAmount, isWinner, winningHand = [], stage, amountWon }) => {
+  return (
+    <svg className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)]" viewBox="0 0 100 100">
+      <circle
+        className="text-primary-accent/50"
+        strokeWidth="3"
+        stroke="currentColor"
+        fill="transparent"
+        r="48"
+        cx="50"
+        cy="50"
+        style={{
+          strokeDasharray: 314,
+          animation: 'player-timer 15s linear forwards',
+          transform: 'rotate(-90deg)',
+          transformOrigin: '50% 50%',
+        }}
+      />
+    </svg>
+  );
+};
+
+
+const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode, cardBackUrl, formatDisplayAmount, isWinner, winningHand = [], stage, amountWon, bestHandName }) => {
+    const { assets } = useContext(AssetContext);
     const isFolded = player.isFolded;
     const isActive = player.isActive;
 
@@ -41,10 +70,22 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     const isCardInWinningHand = (card: CardType) => {
         return winningHand.some(whCard => whCard.rank === card.rank && whCard.suit === card.suit);
     }
+    
+    const playerStateClasses = cn({
+        'opacity-40 grayscale': isFolded,
+        'scale-105 z-10': isActive,
+        'transition-all duration-300': true,
+    });
 
     return (
-        <div className={`relative flex flex-col items-center transition-all duration-300 w-32 ${isFolded ? 'opacity-50' : ''} ${isActive ? 'scale-110 shadow-glow-primary rounded-lg z-10' : ''}`}>
+        <div className={`relative flex flex-col items-center w-32 ${playerStateClasses}`}>
             {isWinner && <div className="absolute -inset-2 animate-firework rounded-full pointer-events-none" />}
+            
+            {isMainPlayer && bestHandName && (
+                <div className="absolute top-0 -translate-y-full mb-1 bg-black/70 backdrop-blur-sm text-gold-accent px-3 py-1 rounded-full text-xs font-semibold shadow-lg animate-fade-in whitespace-nowrap">
+                    {bestHandName}
+                </div>
+            )}
 
             {/* 1. Cards */}
             <div className={`relative flex items-end justify-center h-16 ${isMainPlayer ? '' : 'transform scale-90 -mb-2'}`}>
@@ -79,7 +120,10 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
             {/* 2. Avatar & Info Bubble (pulled up to overlap cards) */}
             <div className="relative flex flex-col items-center -mt-8 w-full">
                 <div className="relative z-10">
-                    <PlayerAvatar player={player} />
+                    <div className="relative">
+                        <PlayerAvatar player={player} />
+                        <PlayerTimer isActive={isActive && !isFolded} />
+                    </div>
                     {isDealer && (
                         <div className="absolute -top-1 -right-2 text-white transform-gpu animate-pulse">
                             <DealerChipIcon className="w-6 h-6 bg-white text-black rounded-full p-0.5 shadow-lg" />
@@ -87,16 +131,25 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
                     )}
                 </div>
 
-                <div className={`w-full max-w-[120px] bg-black/70 backdrop-blur-sm border border-brand-border rounded-lg px-3 py-1 text-center -mt-6 ${isWinner ? 'border-gold-accent shadow-glow-gold' : ''}`}>
+                <div className={cn(
+                    "w-full max-w-[120px] bg-surface/80 backdrop-blur-sm border rounded-lg px-3 py-1 text-center -mt-6 shadow-lg",
+                    isWinner ? 'border-gold-accent shadow-glow-gold' : 'border-brand-border',
+                    isActive ? 'border-primary-accent' : 'border-brand-border'
+                )}>
                     <p className="text-sm font-bold truncate pt-6">{player.name}</p>
                     <p className={`text-base font-mono ${player.stack > 0 ? 'text-white' : 'text-danger'}`}>{formatDisplayAmount(player.stack)}</p>
                 </div>
             </div>
 
-            {/* 3. Bet Bubble */}
-            {player.bet > 0 && (
-                <div className="mt-2 bg-background-dark border border-gold-accent text-gold-accent px-2 py-0.5 rounded-full text-xs font-mono shadow-md">
-                    {formatDisplayAmount(player.bet)}
+            {/* 3. Bet Chip Stack */}
+            {player.bet > 0 && !isFolded && (
+                 <div className="absolute bottom-[-24px] flex flex-col items-center">
+                    <div className="relative w-8 h-8">
+                        <img src={assets.iconPokerChip} alt="chip" className="w-full h-full text-gold-accent"/>
+                    </div>
+                    <div className="bg-black/70 border border-gold-accent text-gold-accent px-2 py-0.5 rounded-full text-xs font-mono shadow-md -mt-3">
+                        {formatDisplayAmount(player.bet)}
+                    </div>
                 </div>
             )}
             

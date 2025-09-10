@@ -3,23 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --background-dark: #1A202C; /* A darker, more neutral color */
-  --background-light: #2D3748;
-  --surface-color: #4A5568;
-  --border-color: #718096;
-  --primary-accent: #f56565; /* A vibrant red for primary actions */
-  --gold-accent: #ECC94B; /* A rich gold for highlights */
-  --text-primary: #F7FAFC;
-  --text-secondary: #A0AEC0;
-  --danger-color: #E53E3E;   /* Solid Red */
-  --warning-color: #ED8936;  /* Solid Orange */
-  --success-color: #48BB78;  /* Solid Green */
+  /* A more sophisticated dark theme for a premium poker feel */
+  --background-dark: #121820;      /* Very dark, slightly blue-tinted background */
+  --background-light: #1A222C;     /* Lighter shade for modals, navbars */
+  --surface-color: #243040;        /* Player pods, button backgrounds */
+  --border-color: #4A5568;         /* Subtle borders */
   
-  --button-inactive-bg: #4A5568; /* Use a more subtle surface color for inactive nav buttons */
-  --button-inactive-text: #F7FAFC;
-  --button-active-bg: var(--gold-accent); /* Gold for the active nav button */
-  --button-active-text: #1A202C;
+  /* Action & Accent Colors */
+  --primary-accent: #48BB78;  /* A vibrant, confident green for positive actions (Raise, Bet) */
+  --gold-accent: #ECC94B;     /* Rich gold for pots, winners, highlights */
+  --text-primary: #EDF2F7;        /* Off-white for primary text */
+  --text-secondary: #A0AEC0;      /* Lighter gray for secondary text */
+  
+  /* Specific Action Colors */
+  --danger-color: #E53E3E;   /* Red for Fold */
+  --warning-color: #4299E1;  /* A calm blue for Call/Check */
+  --success-color: var(--primary-accent); /* Green for Raise/Bet, aliased for consistency */
+  
+  /* Navigation Bar Colors */
+  --button-inactive-bg: #1A222C; /* Same as light background */
+  --button-inactive-text: var(--text-secondary);
+  --button-active-bg: var(--gold-accent);
+  --button-active-text: #121820; /* Dark text on gold background */
 }
+
 
 body {
   background-color: var(--background-dark);
@@ -53,4 +60,11 @@ body {
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
+}
+
+/* Custom class for the poker table felt */
+.poker-felt {
+  background-color: #054b24;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 60%),
+                    url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23065c2e" fill-opacity="0.4"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
 }
