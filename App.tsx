@@ -1,24 +1,27 @@
-import React, { useState, useCallback, useEffect, FC } from 'react';
+
+import React, { useState, useCallback, useEffect, FC, useContext } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
 import Slots from './components/Slots';
 import Roulette from './components/Roulette';
 import WalletModal from './components/WalletModal';
-import { AssetProvider } from './contexts/AssetContext';
+import { AssetProvider, AssetContext } from './contexts/AssetContext';
 import { TableConfig } from './types';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { Toaster } from 'sonner';
-import { PokerChipIcon, RouletteIcon, SlotMachineIcon } from './components/Icons';
 
 // --- Start of components defined in-file to avoid creating new files ---
 
-const BankIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect>
-    <path d="M16 21V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v16"></path>
-    <path d="M12 12h.01"></path>
-  </svg>
-);
+const UrlIcon = ({ src, className }: { src: string; className?: string }) => {
+  if (!src) return <div className={className} />; // Return an empty div if src is missing
+  return (
+    <div
+      className={`icon-mask ${className}`}
+      style={{ '--icon-url': `url(${src})` } as React.CSSProperties}
+    />
+  );
+};
+
 
 type Tab = 'POKER' | 'SLOTS' | 'ROULETTE';
 
@@ -45,29 +48,31 @@ const NavButton = ({ label, icon, isActive, onClick }: { label: string; icon: Re
 };
 
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onTabChange, onBankClick }) => {
+  const { assets } = useContext(AssetContext);
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 h-16 bg-background-light border-t border-brand-border flex z-50">
       <NavButton
         label="Покер"
-        icon={<PokerChipIcon className="w-6 h-6" />}
+        icon={<UrlIcon src={assets.iconPokerChip} className="w-6 h-6" />}
         isActive={activeTab === 'POKER'}
         onClick={() => onTabChange('POKER')}
       />
       <NavButton
         label="Рулетка"
-        icon={<RouletteIcon className="w-6 h-6" />}
+        icon={<UrlIcon src={assets.iconRoulette} className="w-6 h-6" />}
         isActive={activeTab === 'ROULETTE'}
         onClick={() => onTabChange('ROULETTE')}
       />
       <NavButton
         label="Слоты"
-        icon={<SlotMachineIcon className="w-6 h-6" />}
+        icon={<UrlIcon src={assets.iconSlotMachine} className="w-6 h-6" />}
         isActive={activeTab === 'SLOTS'}
         onClick={() => onTabChange('SLOTS')}
       />
       <NavButton
         label="Банк"
-        icon={<BankIcon className="w-6 h-6" />}
+        icon={<UrlIcon src={assets.iconBank} className="w-6 h-6" />}
         isActive={false} // The bank button opens a modal and is never the "active tab"
         onClick={onBankClick}
       />

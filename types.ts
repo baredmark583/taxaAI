@@ -100,6 +100,7 @@ export interface IconAssets {
     iconFold: string;
     iconCall: string;
     iconRaise: string;
+    iconBank: string;
 }
 
 export interface GameAssets extends IconAssets {
