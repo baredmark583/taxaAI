@@ -17,7 +17,7 @@ const Reel: React.FC<{ symbols: SlotSymbol[]; spinning: boolean; reelId: number 
   useEffect(() => {
     if (reelRef.current) {
       // Set the final position without animation on initial render or when not spinning
-      const finalPosition = `translateY(-${(symbols.length - 3) * 104}px)`; // 104px = h-24 (96px) + gap
+      const finalPosition = `translateY(-${(symbols.length - 3) * 104}px)`;
       if (!spinning) {
         reelRef.current.style.transition = 'none';
         reelRef.current.style.transform = finalPosition;
@@ -44,7 +44,7 @@ const Reel: React.FC<{ symbols: SlotSymbol[]; spinning: boolean; reelId: number 
     <div className="w-24 h-[312px] sm:w-32 sm:h-[312px] overflow-hidden bg-black/50 rounded-lg shadow-inner">
       <div ref={reelRef} className="flex flex-col">
         {repeatedSymbols.map((symbol, i) => (
-          <div key={i} className="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-24 p-2 flex items-center justify-center">
+          <div key={i} className="flex-shrink-0 w-24 h-[104px] sm:w-32 sm:h-[104px] p-2 flex items-center justify-center">
             <img src={symbol.imageUrl} alt={symbol.name} className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]" />
           </div>
         ))}
