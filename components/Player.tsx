@@ -78,7 +78,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     });
 
     return (
-        <div className={`relative flex flex-col items-center w-32 ${playerStateClasses}`}>
+        <div className={`relative flex flex-col items-center ${isMainPlayer ? 'w-32' : 'w-24'} ${playerStateClasses}`}>
             {isWinner && <div className="absolute -inset-2 animate-firework rounded-full pointer-events-none" />}
             
             {isMainPlayer && bestHandName && (

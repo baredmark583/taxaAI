@@ -173,7 +173,8 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
   
   // Effect for handling the autospin loop
   useEffect(() => {
-    let autoSpinTimeout: NodeJS.Timeout;
+    // FIX: Replace NodeJS.Timeout with ReturnType<typeof setTimeout> to resolve issue with missing global NodeJS type.
+    let autoSpinTimeout: ReturnType<typeof setTimeout>;
 
     if (isAutoSpinning && !spinning) {
       if (balance < betAmount) {

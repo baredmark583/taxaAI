@@ -26,10 +26,10 @@ const getOpponentPositions = (numOpponents: number) => {
     const positions: React.CSSProperties[] = [];
     if (numOpponents === 0) return positions;
 
-    const radiusX = 65;
-    const radiusY = 55;
+    const radiusX = 38; // Was 65, adjusted to fit on smaller screens
+    const radiusY = 35; // Was 55, adjusted for a more circular feel and to prevent vertical overflow
     const centerX = 50;
-    const centerY = 45; // Shift center up slightly
+    const centerY = 55; // Was 45, pushed down to prevent top players from being cut off
     
     // Distribute opponents over the top ~200 degrees of the oval
     const totalAngle = (200 * Math.PI) / 180;
