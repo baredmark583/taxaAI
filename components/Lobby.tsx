@@ -50,23 +50,37 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
           
           <div className="p-2 sm:p-4 space-y-3 max-h-[calc(100vh-22rem)] overflow-y-auto">
               {tablesToShow.length > 0 ? tablesToShow.map(table => (
-                  <div key={table.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface/50 rounded-lg hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
-                      <div>
-                          <p className="font-bold text-text-primary">{table.name}</p>
-                          <p className="text-sm text-text-secondary">No-Limit Hold'em</p>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
-                           <div className="text-center">
-                              <p className="font-mono text-primary-accent text-sm sm:text-base">
-                                  {currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}
-                              </p>
-                              <p className="text-xs text-text-secondary">Stakes</p>
+                  <div key={table.id} className="bg-surface/50 rounded-lg p-3 hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
+                      <div className="flex flex-wrap items-center justify-between gap-y-3">
+                          {/* Block 1: Name and Description */}
+                          <div className="flex-grow pr-4">
+                              <p className="font-bold text-text-primary">{table.name}</p>
+                              <p className="text-sm text-text-secondary">No-Limit Hold'em</p>
                           </div>
-                          <div className="flex items-center space-x-1">
-                              <UsersIcon className="w-5 h-5 text-text-secondary" />
-                              <span className="font-mono text-text-primary">{table.players}/{table.maxPlayers}</span>
+          
+                          {/* Block 2: Stakes and Players */}
+                          <div className="flex items-center gap-4 sm:gap-6">
+                              <div className="text-center">
+                                  <p className="font-mono text-primary-accent text-sm sm:text-base">
+                                      {currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}
+                                  </p>
+                                  <p className="text-xs text-text-secondary">Stakes</p>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                  <UsersIcon className="w-5 h-5 text-text-secondary" />
+                                  <span className="font-mono text-text-primary">{table.players}/{table.maxPlayers}</span>
+                              </div>
                           </div>
-                          <button onClick={() => onEnterPoker(table)} className="bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success flex-shrink-0">Join</button>
+          
+                          {/* Block 3: Join Button */}
+                          <div className="w-full sm:w-auto sm:pl-4">
+                              <button
+                                  onClick={() => onEnterPoker(table)}
+                                  className="w-full sm:w-auto bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success"
+                              >
+                                  Join
+                              </button>
+                          </div>
                       </div>
                   </div>
               )) : (

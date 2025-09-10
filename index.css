@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --background-dark: #0D0D0D;
-  --background-light: #1A1A1A;
-  --surface-color: #1F1F1F;
-  --border-color: #333333;
+  --background-dark: #212121;
+  --background-light: #2c2c2c;
+  --surface-color: #363636;
+  --border-color: #3d5443;
   --primary-accent: #00E0FF; /* Cyan */
   --gold-accent: #FFD700;
   --text-primary: #FFFFFF;
