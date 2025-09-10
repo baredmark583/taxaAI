@@ -10,10 +10,10 @@ interface SettingsModalProps {
 }
 
 const predefinedCardBacks = [
-    { name: 'Default', url: 'https://www.svgrepo.com/show/424339/poker-gambling-game.svg' },
+    { name: 'Default', url: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg' },
     { name: 'Blue', url: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Blue_back.svg' },
-    { name: 'Red', url: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg' },
     { name: 'Abstract', url: 'https://www.svgrepo.com/show/472548/card-back.svg' },
+    { name: 'Simple', url: 'https://www.svgrepo.com/show/424339/poker-gambling-game.svg' },
 ];
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onActivateGodMode, isAdmin, onSettingsChange }) => {

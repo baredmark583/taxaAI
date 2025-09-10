@@ -22,9 +22,10 @@ const generateDefaultCardFaces = () => {
     [Rank.SIX]: '6', [Rank.FIVE]: '5', [Rank.FOUR]: '4', [Rank.THREE]: '3', [Rank.TWO]: '2',
   };
 
-  for (const suit of Object.values(Suit)) {
+  // FIX: Cast Object.values to the specific enum array type to prevent index signature errors.
+  for (const suit of Object.values(Suit) as Suit[]) {
     faces[suit] = {};
-    for (const rank of Object.values(Rank)) {
+    for (const rank of Object.values(Rank) as Rank[]) {
       faces[suit]![rank] = pattern
         .replace('{rank}', rankNameMap[rank])
         .replace('{suit}', suitNameMap[suit]);
@@ -48,7 +49,7 @@ interface AssetContextType {
 
 // Default asset values
 const defaultAssets: GameAssets = {
-  cardBackUrl: 'https://www.svgrepo.com/show/424339/poker-gambling-game.svg',
+  cardBackUrl: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg',
   tableBackgroundUrl: 'https://i.imgur.com/Q9x2s70.png',
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),

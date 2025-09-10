@@ -1,197 +1,144 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
-import { GameMode, TableConfig, GamePhase } from '../types';
+
+import React, { useState, useMemo, useContext } from 'react';
+import { TableConfig, GameMode, GameStage, Card as CardType } from '../types';
+import usePokerGame from '../hooks/usePokerGame';
 import Player from './Player';
 import CommunityCards from './CommunityCards';
 import ActionControls from './ActionControls';
-import usePokerGame from '../hooks/usePokerGame';
-import { ExitIcon, SettingsIcon } from './Icons';
 import SettingsModal from './SettingsModal';
+import WinnerAnnouncement from './WinnerAnnouncement';
+// FIX: Import the newly added SettingsIcon.
+import { ExitIcon, SettingsIcon } from './Icons';
 import { AssetContext } from '../contexts/AssetContext';
-
-interface TelegramUser {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-}
-
-interface UserSettings {
-    cardBackUrl: string;
-    showInBB: boolean;
-}
 
 interface GameTableProps {
   table: TableConfig;
-  initialStack: number;
   onExit: () => void;
-  isGodMode: boolean;
-  setIsGodMode: (active: boolean) => void;
-  telegramUser: TelegramUser;
-  initData: string;
-  isAdmin: boolean;
 }
 
-// Defines 9 seat positions around the oval table, starting from bottom-center (user).
-const playerSeatPositions = [
-  { bottom: 'calc(0% - 6rem)', left: '50%' }, // Seat 0 (User)
-  { bottom: '12%', left: '18%' },               // Seat 1
-  { top: '50%', left: '5%', transform: 'translateY(-50%)' },  // Seat 2
-  { top: '18%', left: '25%' },                // Seat 3
-  { top: 'calc(0% - 1rem)', left: '50%' },      // Seat 4 (Top center)
-  { top: '18%', right: '25%' },               // Seat 5
-  { top: '50%', right: '5%', transform: 'translateY(-50%)' }, // Seat 6
-  { bottom: '12%', right: '18%' },              // Seat 7
-  { bottom: '5%', right: '25%'},             // Seat 8 - Fallback
-];
+const getPlayerPositions = (numPlayers: number) => {
+    const positions: React.CSSProperties[] = [];
+    const radiusX = 45; // percentage
+    const radiusY = 38; // percentage
+    const centerX = 50;
+    const centerY = 55;
+    const angleOffset = -Math.PI / 2;
 
-const GameTable: React.FC<GameTableProps> = ({ table, initialStack, onExit, isGodMode, setIsGodMode, telegramUser, initData, isAdmin }) => {
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { assets } = useContext(AssetContext);
-  const userId = telegramUser.id.toString();
-  const { state, dispatchPlayerAction, isConnected } = usePokerGame(initialStack, table.maxPlayers, table.stakes.small, table.stakes.big, userId, initData);
-
-  const [userSettings, setUserSettings] = useState<UserSettings>({
-    cardBackUrl: assets.cardBackUrl,
-    showInBB: false,
-  });
-
-  useEffect(() => {
-    try {
-        const savedSettings = localStorage.getItem('pokerUserSettings');
-        if (savedSettings) {
-            const parsedSettings = JSON.parse(savedSettings);
-            if (!parsedSettings.cardBackUrl) {
-                parsedSettings.cardBackUrl = assets.cardBackUrl;
-            }
-            setUserSettings(parsedSettings);
-        } else {
-            setUserSettings(prev => ({ ...prev, cardBackUrl: assets.cardBackUrl }));
-        }
-    } catch (error) {
-        console.error("Failed to load user settings from localStorage", error);
-        setUserSettings(prev => ({ ...prev, cardBackUrl: assets.cardBackUrl }));
+    for (let i = 0; i < numPlayers; i++) {
+        const angle = angleOffset + (i / numPlayers) * 2 * Math.PI;
+        const x = centerX + radiusX * Math.cos(angle);
+        const y = centerY + radiusY * Math.sin(angle);
+        positions.push({ top: `${y}%`, left: `${x}%`, transform: 'translate(-50%, -50%)' });
     }
-  }, [assets.cardBackUrl]);
+    return positions;
+};
 
-  const handleSettingsChange = useCallback((newSettings: Partial<UserSettings>) => {
-    setUserSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
+const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
+    const { assets } = useContext(AssetContext);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [showInBB, setShowInBB] = useState(false);
+    const [godMode, setGodMode] = useState(false);
+    const [customCardBack, setCustomCardBack] = useState<string | undefined>(undefined);
 
-  if (!isConnected || !state) {
-      return (
-          <div className="w-screen h-screen bg-background-dark flex flex-col items-center justify-center text-white">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-accent"></div>
-              <p className="mt-4 text-xl tracking-wider">{!isConnected ? "Connecting..." : "Joining Table..."}</p>
-          </div>
-      );
-  }
+    const { state, dispatchPlayerAction, isConnected, userId } = usePokerGame(table.id, 1000, table.maxPlayers, table.stakes.small, table.stakes.big);
+    
+    const playerPositions = useMemo(() => getPlayerPositions(table.maxPlayers), [table.maxPlayers]);
+    
+    const formatDisplayAmount = (amount: number) => {
+        if (showInBB) return `${(amount / table.stakes.big).toFixed(1)} BB`;
+        return table.mode === GameMode.REAL_MONEY ? `${amount.toFixed(2)}` : `$${amount.toLocaleString()}`;
+    };
 
-  const { players, communityCards, pot, activePlayerIndex, gamePhase, log, bigBlind } = state;
+    const mainPlayer = state?.players.find(p => p.id === userId);
 
-  const userPlayer = players.find(p => p.id === userId);
-  const currency = table.mode === GameMode.REAL_MONEY ? 'TON' : '$';
-  
-  const formatDisplayAmount = (amount: number) => {
-    if (userSettings.showInBB && bigBlind > 0) {
-      const amountInBB = amount / bigBlind;
-      return `${amountInBB.toFixed(1)} BB`;
+    const highlightedCards: CardType[] = useMemo(() => {
+        if (state?.stage !== GameStage.SHOWDOWN || !state.winners) return [];
+        return state.winners.flatMap(winner => winner.winningHand);
+    }, [state]);
+
+    if (!isConnected && !state) {
+        return (
+            <div className="w-screen h-screen bg-background-dark flex flex-col items-center justify-center text-white">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-accent"></div>
+                <p className="mt-4 text-xl tracking-wider">Connecting to table...</p>
+            </div>
+        );
     }
-    if (table.mode === GameMode.REAL_MONEY) {
-      return `${amount.toFixed(4)}`;
-    }
-    return `${amount.toLocaleString()}`;
-  };
 
-  const userHandCards = userPlayer?.handResult?.cards || [];
+    if (!state) {
+        return <div className="w-screen h-screen bg-background-dark flex items-center justify-center text-white">Waiting for game state...</div>;
+    }
 
   return (
-    <div className="w-screen h-screen bg-background-dark flex flex-col items-center justify-center p-2 overflow-hidden font-sans bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-surface/80 via-background-light to-background-dark">
-        {/* Header */}
-        <div className="absolute top-0 left-0 right-0 p-3 flex justify-between items-center z-20">
-            <button onClick={onExit} className="p-2 bg-black/40 backdrop-blur-sm rounded-full text-text-secondary hover:text-white transition-colors">
-                <ExitIcon className="w-6 h-6" />
-            </button>
-            <div className="text-center bg-black/40 backdrop-blur-sm px-4 py-1.5 rounded-lg border border-brand-border/50">
-                <p className="text-sm font-bold text-primary-accent">{table.name}</p>
-                <p className="text-xs text-text-secondary">Stakes: {currency}{table.stakes.small}/{currency}{table.stakes.big}</p>
-            </div>
-            <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-black/40 backdrop-blur-sm rounded-full text-text-secondary hover:text-white transition-colors">
-                <SettingsIcon className="w-6 h-6" />
-            </button>
-        </div>
-
-      <div 
-        className="relative w-[95vw] h-[60vh] max-w-4xl max-h-[600px] bg-green-900 border-[16px] border-[#3a2a1a] rounded-[50%] shadow-2xl flex items-center justify-center bg-cover bg-center shadow-[0_0_35px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,0.5)]"
-        style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}
-       >
-        <div className="absolute w-[calc(100%-60px)] h-[calc(100%-60px)] border-2 border-yellow-700/30 rounded-[50%]"></div>
-        
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center flex flex-col items-center space-y-2">
-           <div className="bg-black/60 backdrop-blur-sm rounded-lg px-4 py-1 border border-brand-border/50">
-             <p className="text-gold-accent text-xs uppercase tracking-wider">Total Pot</p>
-             <p className="text-white text-lg font-bold tracking-wider">{formatDisplayAmount(pot)}</p>
-           </div>
-           
-           <div className="h-24 flex items-center">
-             <CommunityCards cards={communityCards} phase={gamePhase} highlightedCards={userHandCards} />
-           </div>
-
-           <div className="text-center text-white font-semibold text-xs bg-black/50 px-3 py-1 rounded-full">
-                <span>NLHE | {formatDisplayAmount(table.stakes.small)}/{formatDisplayAmount(table.stakes.big)}</span>
-                <span className="text-text-secondary"> (Practice)</span>
-            </div>
-        </div>
-
-        {/* Players */}
-        {players.map((player) => {
-            const style = player.id === userId
-                ? playerSeatPositions[0]
-                : playerSeatPositions[player.position] || playerSeatPositions[8];
-            return (
-                <div key={player.id} className="absolute" style={{ ...style, transform: `${style.transform || ''} translateX(-50%)` }}>
-                    <Player
-                        player={player}
-                        isUser={player.id === userId}
-                        isActive={players[activePlayerIndex]?.id === player.id}
-                        formatDisplayAmount={formatDisplayAmount}
-                        godModeActive={isGodMode}
-                        gamePhase={gamePhase}
-                        overrideCardBackUrl={player.id === userId ? userSettings.cardBackUrl : undefined}
-                    />
+    <div className="w-screen h-screen bg-cover bg-center text-white overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}>
+        <div className="absolute inset-0 bg-black/50">
+            <div className="relative w-full h-full flex flex-col items-center justify-between p-2 sm:p-4">
+                <div className="w-full flex justify-between items-start">
+                     <button onClick={onExit} className="flex items-center space-x-2 px-3 py-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors text-sm"><ExitIcon/><span>Lobby</span></button>
+                    <div className="text-center bg-black/50 px-4 py-1 rounded-b-lg">
+                        <h1 className="text-lg font-bold">{table.name}</h1>
+                        <p className="text-xs text-text-secondary">{table.mode === GameMode.REAL_MONEY ? 'Real Money' : 'Play Money'} - {formatDisplayAmount(table.stakes.small)}/{formatDisplayAmount(table.stakes.big)}</p>
+                    </div>
+                     <button onClick={() => setIsSettingsOpen(true)} className="p-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors"><SettingsIcon/></button>
                 </div>
-            )
-        })}
 
-        {gamePhase === GamePhase.SHOWDOWN && log.length > 0 && (
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-black/80 p-4 rounded-xl shadow-lg text-center animate-fade-in border border-gold-accent">
-                <p className="text-xl font-bold text-gold-accent">{log[log.length-1]}</p>
+                <div className="relative w-[85vw] h-[45vh] sm:w-[70vw] sm:h-[40vh] border-4 border-yellow-800/50 bg-green-900/70 rounded-full">
+                     {state.players.map((player, index) => {
+                         const pos = playerPositions[index % table.maxPlayers];
+                         const winnerInfo = state.winners?.find(w => w.playerId === player.id);
+                         return (
+                            <div key={player.id} className="absolute" style={pos}>
+                                <Player 
+                                    player={player} 
+                                    isDealer={index === state.dealerIndex} 
+                                    isMainPlayer={player.id === userId} 
+                                    godMode={godMode} 
+                                    formatDisplayAmount={formatDisplayAmount} 
+                                    cardBackUrl={customCardBack}
+                                    isWinner={!!winnerInfo}
+                                    winningHand={highlightedCards}
+                                    stage={state.stage}
+                                    amountWon={winnerInfo?.amountWon}
+                                />
+                            </div>
+                         )
+                     })}
+                     
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <CommunityCards cards={state.communityCards} stage={state.stage} winningHand={highlightedCards} />
+                        <p className="text-lg font-bold bg-black/50 px-3 py-1 rounded-full">Pot: {formatDisplayAmount(state.pot)}</p>
+                    </div>
+                </div>
+                
+                <div className="w-full flex flex-col items-center">
+                    {mainPlayer && <ActionControls 
+                        player={mainPlayer} 
+                        isActive={state.players[state.activePlayerIndex]?.id === mainPlayer.id} 
+                        onAction={dispatchPlayerAction}
+                        currentBet={state.currentBet}
+                        pot={state.pot}
+                        smallBlind={table.stakes.small}
+                        bigBlind={table.stakes.big}
+                        formatDisplayAmount={formatDisplayAmount}
+                     />}
+                </div>
+
+                 <SettingsModal 
+                    isOpen={isSettingsOpen}
+                    onClose={() => setIsSettingsOpen(false)}
+                    onActivateGodMode={() => setGodMode(true)}
+                    isAdmin={userId === '7327258482'}
+                    onSettingsChange={(settings) => {
+                        if (settings.showInBB !== undefined) setShowInBB(settings.showInBB);
+                        if (settings.cardBackUrl) setCustomCardBack(settings.cardBackUrl);
+                    }}
+                />
+                
+                 {state.stage === GameStage.SHOWDOWN && state.winners && state.winners.length > 0 && 
+                    <WinnerAnnouncement winners={state.winners} />
+                 }
             </div>
-        )}
-      </div>
-
-       {/* Action Controls */}
-        {userPlayer && (
-             <ActionControls 
-                player={userPlayer}
-                isActive={players[activePlayerIndex]?.id === userPlayer.id}
-                onAction={dispatchPlayerAction}
-                currentBet={state.currentBet}
-                pot={state.pot}
-                smallBlind={state.smallBlind}
-                bigBlind={state.bigBlind}
-                formatDisplayAmount={formatDisplayAmount}
-             />
-        )}
-      
-      <SettingsModal 
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        onActivateGodMode={() => setIsGodMode(true)}
-        isAdmin={isAdmin}
-        onSettingsChange={handleSettingsChange}
-      />
-
+        </div>
     </div>
   );
 };

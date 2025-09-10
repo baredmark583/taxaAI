@@ -6,10 +6,23 @@ import { GameState, PlayerAction } from '../types';
 const API_URL = (import.meta as any).env.VITE_API_URL;
 const WS_URL = (import.meta as any).env.VITE_WS_URL;
 
-const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: number, bigBlind: number, userId: string, initData: string) => {
+const usePokerGame = (tableId: string, initialStack: number, numPlayers: number, smallBlind: number, bigBlind: number) => {
   const [state, setState] = useState<GameState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const webSocketRef = useRef<WebSocket | null>(null);
+
+  const [userId, setUserId] = useState<string | null>(null);
+  const [initData, setInitData] = useState<string | null>(null);
+
+  useEffect(() => {
+     const TWebApp = (window as any).Telegram?.WebApp;
+     if (TWebApp && TWebApp.initData) {
+        setInitData(TWebApp.initData);
+        if (TWebApp.initDataUnsafe?.user) {
+            setUserId(TWebApp.initDataUnsafe.user.id.toString());
+        }
+     }
+  }, []);
 
   useEffect(() => {
     if (!WS_URL || !userId || !initData) {
@@ -42,6 +55,7 @@ const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: numb
           setState(message.payload);
         } else if (message.type === 'error') {
             alert(`Server error: ${message.payload.message}`);
+            console.error('Server error:', message.payload.message);
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -62,26 +76,23 @@ const usePokerGame = (initialStack: number, numPlayers: number, smallBlind: numb
     return () => {
       ws.close();
     };
-  }, [initialStack, numPlayers, smallBlind, bigBlind, userId, initData]); // Reconnect if game config changes
+  }, [tableId, initialStack, numPlayers, smallBlind, bigBlind, userId, initData]); // Reconnect if game config changes
 
   const dispatchPlayerAction = useCallback((action: PlayerAction) => {
-    if (webSocketRef.current?.readyState === WebSocket.OPEN) {
-      const userPlayer = state?.players.find(p => p.id === userId);
-      if (userPlayer) {
-         webSocketRef.current.send(JSON.stringify({
+    if (webSocketRef.current?.readyState === WebSocket.OPEN && userId) {
+        webSocketRef.current.send(JSON.stringify({
             type: 'playerAction',
             payload: {
-                playerId: userPlayer.id,
+                playerId: userId,
                 action,
             },
         }));
-      }
     } else {
-      console.error('WebSocket is not connected.');
+      console.error('WebSocket is not connected or user is not identified.');
     }
-  }, [state, userId]);
+  }, [userId]);
 
-  return { state, dispatchPlayerAction, isConnected };
+  return { state, dispatchPlayerAction, isConnected, userId };
 };
 
 export default usePokerGame;

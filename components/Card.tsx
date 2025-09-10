@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Card as CardType, Suit, Rank } from '../types';
+import { Card as CardType } from '../types';
 import { AssetContext } from '../contexts/AssetContext';
 
 interface CardProps {

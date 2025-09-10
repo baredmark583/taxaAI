@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { GameMode, TableConfig } from '../types';
-import WalletModal from './WalletModal';
 import { UsersIcon, PokerChipIcon, SlotMachineIcon, RouletteIcon } from './Icons';
 
 interface LobbyProps {
   onEnterPoker: (table: TableConfig) => void;
   onEnterSlots: () => void;
   onEnterRoulette: () => void;
+  onManageWallet: () => void;
   realMoneyBalance: number;
   playMoneyBalance: number;
   setRealMoneyBalance: (balance: number) => void;
@@ -22,8 +22,7 @@ const mockTables: TableConfig[] = [
 ];
 
 
-const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulette, realMoneyBalance, playMoneyBalance, setRealMoneyBalance }) => {
-  const [isWalletOpen, setIsWalletOpen] = useState(false);
+const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulette, onManageWallet, realMoneyBalance, playMoneyBalance, setRealMoneyBalance }) => {
   const [moneyTab, setMoneyTab] = useState<GameMode>(GameMode.REAL_MONEY);
   const [gameTab, setGameTab] = useState('POKER');
 
@@ -102,26 +101,26 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
 
   return (
     <div className="min-h-screen bg-background-dark flex flex-col items-center justify-center p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark">
-      <div className="text-center mb-8 animate-slide-up">
+      <div className="text-center mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
         <h1 className="text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-primary-accent drop-shadow-[0_0_15px_rgba(0,224,255,0.4)]">
           CRYPTO POKER CLUB
         </h1>
         <p className="text-text-secondary mt-2">The ultimate Texas Hold'em experience on Telegram.</p>
       </div>
 
-      <div className="w-full max-w-4xl bg-background-light rounded-xl shadow-2xl border border-brand-border animate-slide-up animation-delay-200">
+      <div className="w-full max-w-4xl bg-background-light rounded-xl shadow-2xl border border-brand-border animate-slide-up" style={{ animationDelay: '200ms' }}>
         <div className="flex justify-center p-2 bg-black/30 rounded-t-xl">
           <div className="flex space-x-2 bg-background-dark p-1 rounded-lg">
               <button onClick={() => setGameTab('POKER')} className={gameTabClass('POKER')}>
-                <PokerChipIcon className="w-5 h-5" />
+                <PokerChipIcon />
                 <span>Poker</span>
               </button>
               <button onClick={() => setGameTab('SLOTS')} className={gameTabClass('SLOTS')}>
-                 <SlotMachineIcon className="w-5 h-5" />
+                 <SlotMachineIcon />
                  <span>Slots</span>
               </button>
               <button onClick={() => setGameTab('ROULETTE')} className={gameTabClass('ROULETTE')}>
-                 <RouletteIcon className="w-5 h-5" />
+                 <RouletteIcon />
                  <span>Roulette</span>
               </button>
           </div>
@@ -130,20 +129,14 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
         {renderContent()}
       </div>
       
-      <div className="text-center mt-6 animate-fade-in animation-delay-400">
+      <div className="text-center mt-6 animate-fade-in" style={{ animationDelay: '400ms' }}>
             <button
-                onClick={() => setIsWalletOpen(true)}
+                onClick={onManageWallet}
                 className="text-primary-accent hover:text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-300 hover:bg-primary-accent/10"
             >
                 Manage Crypto Wallet
             </button>
         </div>
-      
-      <WalletModal 
-        isOpen={isWalletOpen} 
-        onClose={() => setIsWalletOpen(false)}
-        currentBalance={realMoneyBalance}
-      />
     </div>
   );
 };
