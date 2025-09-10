@@ -274,7 +274,7 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
                      <button 
                         onClick={handleSpin} 
                         disabled={spinning || isAutoSpinning || balance < betAmount}
-                        className="flex-1 py-4 px-8 bg-gradient-to-b from-success/80 to-success text-black font-bold text-2xl uppercase tracking-wider rounded-lg shadow-lg shadow-success/20 transition-all transform hover:scale-105 disabled:from-gray-600 disabled:to-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
+                        className="flex-1 py-4 px-8 bg-success text-black font-bold text-2xl uppercase tracking-wider rounded-lg shadow-lg shadow-success/20 transition-all transform hover:scale-105 disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
                     >
                         {spinning ? '...' : 'Spin'}
                     </button>
@@ -283,8 +283,8 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
                         disabled={spinning && !isAutoSpinning}
                         className={`py-4 px-6 rounded-lg font-bold text-xl uppercase tracking-wider shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:scale-100 disabled:shadow-none ${
                             isAutoSpinning
-                                ? 'bg-gradient-to-b from-danger/80 to-danger text-white shadow-danger/20'
-                                : 'bg-gradient-to-b from-primary-accent/80 to-primary-accent text-black shadow-primary-accent/20'
+                                ? 'bg-danger text-white shadow-danger/20'
+                                : 'bg-primary-accent text-black shadow-primary-accent/20'
                         }`}
                     >
                         {isAutoSpinning ? 'Stop' : 'Auto'}

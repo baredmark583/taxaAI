@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --background-dark: #2d3748; /* Wet asphalt with blue tint */
-  --background-light: #4a5568;
-  --surface-color: #3e4c5f;
-  --border-color: #5a6a7a;
-  --primary-accent: #FFA500; /* Orange for active */
-  --gold-accent: #FFD700; /* Yellow for inactive */
-  --text-primary: #FFFFFF;
+  --background-dark: #1A202C; /* A darker, more neutral color */
+  --background-light: #2D3748;
+  --surface-color: #4A5568;
+  --border-color: #718096;
+  --primary-accent: #f56565; /* A vibrant red for primary actions */
+  --gold-accent: #ECC94B; /* A rich gold for highlights */
+  --text-primary: #F7FAFC;
   --text-secondary: #A0AEC0;
-  --danger-color: #FF4141;
-  --warning-color: #FFA500;
-  --success-color: #00FF7F;
+  --danger-color: #E53E3E;   /* Solid Red */
+  --warning-color: #ED8936;  /* Solid Orange */
+  --success-color: #48BB78;  /* Solid Green */
   
-  --button-inactive-bg: #FFD700;
-  --button-inactive-text: #1A202C;
-  --button-active-bg: #FFA500;
+  --button-inactive-bg: #4A5568; /* Use a more subtle surface color for inactive nav buttons */
+  --button-inactive-text: #F7FAFC;
+  --button-active-bg: var(--gold-accent); /* Gold for the active nav button */
   --button-active-text: #1A202C;
 }
 

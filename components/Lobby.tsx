@@ -75,7 +75,7 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, realMoneyBalance, playMoney
                         <div className="w-full sm:w-auto sm:pl-4">
                             <button
                                 onClick={() => onEnterPoker(table)}
-                                className="w-full sm:w-auto bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success"
+                                className="w-full sm:w-auto bg-success hover:bg-success/90 text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success"
                             >
                                 Join
                             </button>

@@ -67,7 +67,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
             </div>
             <div className="flex items-center justify-between w-full space-x-4 mt-4">
                 <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold flex-1 transition-transform transform hover:scale-105">Cancel</button>
-                <button onClick={handleBetAction} className="px-6 py-3 bg-gradient-to-b from-success/90 to-success text-black rounded-lg text-white font-bold text-lg shadow-lg shadow-success/20 hover:shadow-glow-success flex-1 transition-all transform hover:scale-105">
+                <button onClick={handleBetAction} className="px-6 py-3 bg-success text-black rounded-lg text-white font-bold text-lg shadow-lg shadow-success/20 hover:shadow-glow-success flex-1 transition-all transform hover:scale-105">
                     Raise to {formatDisplayAmount(actualBetAmount)}
                 </button>
             </div>
@@ -79,7 +79,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
     <div className="w-full max-w-lg mt-4 p-2 flex justify-center items-center gap-2">
       <button
         onClick={() => onAction({ type: 'fold' })}
-        className="flex-1 py-4 bg-gradient-to-b from-danger/80 to-danger text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase hover:shadow-glow-danger"
+        className="flex-1 py-4 bg-danger text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase hover:shadow-glow-danger"
       >
         Fold
       </button>
@@ -87,14 +87,14 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       {canCheck ? (
         <button
           onClick={() => onAction({ type: 'check' })}
-          className="flex-1 py-4 bg-gradient-to-b from-warning/80 to-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
+          className="flex-1 py-4 bg-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
         >
           Check
         </button>
       ) : (
         <button
           onClick={() => onAction({ type: 'call' })}
-          className="flex-1 py-4 bg-gradient-to-b from-warning/80 to-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
+          className="flex-1 py-4 bg-warning text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase"
         >
           Call {toCall > 0 ? formatDisplayAmount(toCall) : ''}
         </button>
@@ -103,14 +103,14 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       <button
         onClick={() => { setBetAmount(minRaise); handleBetAction(); }}
         disabled={minRaise > player.stack + player.bet}
-        className="flex-1 py-4 bg-gradient-to-b from-success/80 to-success text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase disabled:from-gray-600 disabled:to-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
+        className="flex-1 py-4 bg-success text-black font-bold rounded-lg shadow-lg transition-all transform hover:scale-105 uppercase disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none"
       >
         {currentBet > 0 ? `Raise ${formatDisplayAmount(minRaise)}` : `Bet ${formatDisplayAmount(minRaise)}`}
       </button>
 
        <button
         onClick={() => { setBetAmount(minRaise); setIsBetting(true); }}
-        className="p-4 bg-gradient-to-b from-green-900 to-green-800 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105"
+        className="p-4 bg-green-800 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105"
       >
         <RaiseIcon className="w-6 h-6" />
       </button>

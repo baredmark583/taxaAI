@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect, FC, useContext } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -194,15 +195,15 @@ const AppContent: FC = () => {
        <div className="flex flex-col h-screen font-sans bg-background-dark text-text-primary">
         <header className="h-[60px] flex-shrink-0 w-full" />
         
-        <main className="flex-grow overflow-y-auto pb-16">
+        <main className={`flex-grow overflow-y-auto ${!pokerTable ? 'pb-16' : ''}`}>
           {renderContent()}
         </main>
         
-        <BottomNavBar 
+        {!pokerTable && <BottomNavBar 
           activeTab={activeTab}
           onTabChange={setActiveTab}
           onBankClick={() => setWalletModalOpen(true)}
-        />
+        />}
         
         <WalletModal 
           isOpen={isWalletModalOpen}

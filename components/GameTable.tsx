@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useMemo, useContext } from 'react';
 import { TableConfig, GameMode, GameStage, Card as CardType } from '../types';
 import usePokerGame from '../hooks/usePokerGame';
@@ -19,10 +20,10 @@ interface GameTableProps {
 
 const getPlayerPositions = (numPlayers: number) => {
     const positions: React.CSSProperties[] = [];
-    const radiusX = 45; // percentage
-    const radiusY = 38; // percentage
+    const radiusX = 58; // percentage - increased to place players outside the oval
+    const radiusY = 58; // percentage - increased to place players outside the oval
     const centerX = 50;
-    const centerY = 55;
+    const centerY = 50;
     const angleOffset = -Math.PI / 2;
 
     for (let i = 0; i < numPlayers; i++) {
