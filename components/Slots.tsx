@@ -149,21 +149,12 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
   }
 
   return (
-    <div className="w-screen h-screen bg-cover bg-center text-white flex flex-col items-center justify-center p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark"
+    <div className="w-full h-full bg-cover bg-center text-white flex flex-col items-center justify-center p-4 font-sans"
       style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}
     >
        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       
       <div className="relative z-10 w-full max-w-2xl flex flex-col items-center justify-center text-center animate-fade-in">
-        <div className="absolute top-0 left-0">
-            <button 
-                onClick={onExit}
-                className="flex items-center space-x-2 px-3 py-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors text-sm"
-            >
-                <ExitIcon />
-                <span>Lobby</span>
-            </button>
-        </div>
         
         <div className="mb-4">
           <h1 className="text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-gold-accent drop-shadow-[0_0_15px_rgba(255,217,0,0.4)]">

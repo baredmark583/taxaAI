@@ -22,6 +22,10 @@ export default {
         'danger': 'var(--danger-color)',
         'warning': 'var(--warning-color)',
         'success': 'var(--success-color)',
+        'button-inactive-bg': 'var(--button-inactive-bg)',
+        'button-inactive-text': 'var(--button-inactive-text)',
+        'button-active-bg': 'var(--button-active-bg)',
+        'button-active-text': 'var(--button-active-text)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useContext } from 'react';
 import { TableConfig, GameMode, GameStage, Card as CardType } from '../types';
 import usePokerGame from '../hooks/usePokerGame';
@@ -58,7 +59,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
 
     if (!isConnected && !state) {
         return (
-            <div className="w-screen h-screen bg-background-dark flex flex-col items-center justify-center text-white">
+            <div className="w-full h-full bg-background-dark flex flex-col items-center justify-center text-white">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-accent"></div>
                 <p className="mt-4 text-xl tracking-wider">Connecting to table...</p>
             </div>
@@ -66,11 +67,11 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
     }
 
     if (!state) {
-        return <div className="w-screen h-screen bg-background-dark flex items-center justify-center text-white">Waiting for game state...</div>;
+        return <div className="w-full h-full bg-background-dark flex items-center justify-center text-white">Waiting for game state...</div>;
     }
 
   return (
-    <div className="w-screen h-screen bg-cover bg-center text-white overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}>
+    <div className="relative w-full h-full bg-cover bg-center text-white overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}>
         <div className="absolute inset-0 bg-black/50">
             <div className="relative w-full h-full flex flex-col items-center justify-between p-2 sm:p-4">
                 <div className="w-full flex justify-between items-start">

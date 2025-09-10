@@ -173,7 +173,7 @@ const Roulette: React.FC<RouletteProps> = ({ onExit, balance, setBalance }) => {
   );
 
   return (
-    <div className="w-screen h-screen bg-cover bg-center text-white flex flex-col items-center justify-center p-2 sm:p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})` }}>
+    <div className="w-full h-full bg-cover bg-center text-white flex flex-col items-center justify-center p-2 sm:p-4 font-sans overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})` }}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-between">
