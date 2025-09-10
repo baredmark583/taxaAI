@@ -37,34 +37,36 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
     if (gameTab === 'POKER') {
       return (
         <div className="animate-fade-in">
-          <div className="flex justify-between items-center p-4 border-b border-t border-brand-border">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 border-b border-t border-brand-border">
               <div className="flex border border-brand-border rounded-lg overflow-hidden">
                   <button onClick={() => setMoneyTab(GameMode.REAL_MONEY)} className={`px-4 py-2 transition-colors font-semibold ${moneyTab === GameMode.REAL_MONEY ? 'bg-primary-accent text-black' : 'bg-surface hover:bg-background-light'}`}>Real Money</button>
                   <button onClick={() => setMoneyTab(GameMode.PLAY_MONEY)} className={`px-4 py-2 transition-colors font-semibold ${moneyTab === GameMode.PLAY_MONEY ? 'bg-gold-accent text-black' : 'bg-surface hover:bg-background-light'}`}>Play Money</button>
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                   <p className="text-text-secondary text-sm">Balance</p>
                   <p className="text-text-primary font-mono text-lg">{balance} {currencySymbol}</p>
               </div>
           </div>
           
-          <div className="p-4 space-y-3 max-h-[calc(100vh-22rem)] overflow-y-auto">
+          <div className="p-2 sm:p-4 space-y-3 max-h-[calc(100vh-22rem)] overflow-y-auto">
               {tablesToShow.length > 0 ? tablesToShow.map(table => (
-                  <div key={table.id} className="grid grid-cols-12 items-center bg-surface/50 p-3 rounded-lg hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
-                      <div className="col-span-6">
+                  <div key={table.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface/50 rounded-lg hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
+                      <div>
                           <p className="font-bold text-text-primary">{table.name}</p>
                           <p className="text-sm text-text-secondary">No-Limit Hold'em</p>
                       </div>
-                      <div className="col-span-3 text-center">
-                          <p className="font-mono text-primary-accent">{currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}</p>
-                          <p className="text-xs text-text-secondary">Stakes</p>
-                      </div>
-                      <div className="col-span-3 flex justify-end space-x-4 items-center">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
+                           <div className="text-center">
+                              <p className="font-mono text-primary-accent text-sm sm:text-base">
+                                  {currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-text-secondary">Stakes</p>
+                          </div>
                           <div className="flex items-center space-x-1">
                               <UsersIcon className="w-5 h-5 text-text-secondary" />
                               <span className="font-mono text-text-primary">{table.players}/{table.maxPlayers}</span>
                           </div>
-                          <button onClick={() => onEnterPoker(table)} className="bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success">Join</button>
+                          <button onClick={() => onEnterPoker(table)} className="bg-success/80 hover:bg-success text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success flex-shrink-0">Join</button>
                       </div>
                   </div>
               )) : (
@@ -100,12 +102,12 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterSlots, onEnterRoulet
   }
 
   return (
-    <div className="min-h-screen bg-background-dark flex flex-col items-center justify-center p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark">
-      <div className="text-center mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
-        <h1 className="text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-primary-accent drop-shadow-[0_0_15px_rgba(0,224,255,0.4)]">
+    <div className="min-h-screen bg-background-dark flex flex-col items-center p-2 sm:p-4 font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-background-light to-background-dark">
+      <div className="text-center my-4 sm:mb-8 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <h1 className="text-4xl sm:text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-primary-accent drop-shadow-[0_0_15px_rgba(0,224,255,0.4)]">
           CRYPTO POKER CLUB
         </h1>
-        <p className="text-text-secondary mt-2">The ultimate Texas Hold'em experience on Telegram.</p>
+        <p className="text-text-secondary mt-2 text-sm sm:text-base">The ultimate Texas Hold'em experience on Telegram.</p>
       </div>
 
       <div className="w-full max-w-4xl bg-background-light rounded-xl shadow-2xl border border-brand-border animate-slide-up" style={{ animationDelay: '200ms' }}>
