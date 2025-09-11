@@ -55,6 +55,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     const { assets } = useContext(AssetContext);
     const isFolded = player.isFolded;
     const isActive = player.isActive;
+    const isSittingOut = player.isSittingOut;
 
     const showCards = isMainPlayer || godMode || (!isFolded && stage === GameStage.SHOWDOWN);
     const showHand = player.hand && player.hand.length > 0;
@@ -64,7 +65,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     }
     
     const playerStateClasses = cn({
-        'opacity-40 grayscale': isFolded,
+        'opacity-40 grayscale': isFolded || isSittingOut,
         'scale-105 z-10': isActive && isMainPlayer,
         'transition-all duration-300': true,
     });
@@ -91,7 +92,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
             </div>
 
 
-            {showHand && !isFolded && (
+            {showHand && !isFolded && !isSittingOut && (
                 <div className={`flex items-center justify-center -mt-4 z-10`}>
                     <div className="-mr-4 transform -rotate-12">
                         <Card 
@@ -139,6 +140,11 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
              {isFolded && (
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-3 py-1 text-xs font-bold rounded-md uppercase">
                     Fold
+                </div>
+             )}
+              {isSittingOut && (
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-3 py-1 text-xs font-bold rounded-md uppercase">
+                    Ожидание
                 </div>
              )}
         </div>

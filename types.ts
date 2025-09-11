@@ -29,6 +29,7 @@ export interface Player {
     isActive: boolean;
     hasActed?: boolean; // Added for betting round logic
     photoUrl?: string;
+    isSittingOut?: boolean;
 }
 
 export enum GameStage {

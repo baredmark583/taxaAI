@@ -19,6 +19,17 @@ const UrlIcon = ({ src, className }: { src: string; className?: string }) => {
   );
 };
 
+// New component for an empty seat placeholder
+const SeatPlaceholder: React.FC<{ style: React.CSSProperties }> = ({ style }) => (
+    <div
+        style={style}
+        className="absolute w-20 h-20 rounded-full bg-black/20 border-2 border-dashed border-surface flex items-center justify-center text-text-secondary text-xs opacity-50"
+    >
+        <span>Место</span>
+    </div>
+);
+
+
 interface GameTableProps {
   table: TableConfig;
   onExit: () => void;
@@ -32,6 +43,19 @@ const PotDisplay: React.FC<{ amount: number; format: (amount: number) => string 
     </div>
 );
 
+// Pre-defined percentage-based positions for up to 8 opponents
+const opponentSeatPositions = [
+    { top: '50%', left: '5%', transform: 'translate(-50%, -50%)' },
+    { top: '22%', left: '20%', transform: 'translate(-50%, -50%)' },
+    { top: '10%', left: '40%', transform: 'translate(-50%, -50%)' },
+    { top: '10%', left: '60%', transform: 'translate(-50%, -50%)' },
+    { top: '22%', left: '80%', transform: 'translate(-50%, -50%)' },
+    { top: '50%', left: '95%', transform: 'translate(-50%, -50%)' },
+    { top: '78%', left: '80%', transform: 'translate(-50%, -50%)' },
+    { top: '78%', left: '20%', transform: 'translate(-50%, -50%)' },
+];
+
+
 const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
     const { assets } = useContext(AssetContext);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -43,10 +67,6 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
     
     const mainPlayer = useMemo(() => state?.players.find(p => p.id === userId), [state?.players, userId]);
     const opponents = useMemo(() => state?.players.filter(p => p.id !== userId) || [], [state?.players, userId]);
-    
-    // Split opponents into top and bottom rows for the new layout
-    const topOpponents = opponents.slice(0, Math.ceil(opponents.length / 2));
-    const bottomOpponents = opponents.slice(Math.ceil(opponents.length / 2));
 
     const mainPlayerIndex = useMemo(() => state?.players.findIndex(p => p.id === userId) ?? -1, [state?.players, userId]);
 
@@ -105,72 +125,65 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
             </div>
         </header>
         
-        <main className="relative flex-grow flex flex-col justify-between p-2">
-            {/* Top row of opponents */}
-            <div className="flex justify-center items-start gap-2 flex-wrap">
-                 {topOpponents.map((player) => {
-                  const playerIndexInFullList = state.players.findIndex(p => p.id === player.id);
-                  const winnerInfo = state.winners?.find(w => w.playerId === player.id);
-                  return (
-                      <Player 
-                          key={player.id}
-                          player={player} 
-                          isDealer={playerIndexInFullList === state.dealerIndex} 
-                          isMainPlayer={false} 
-                          godMode={godMode} 
-                          formatDisplayAmount={formatDisplayAmount} 
-                          cardBackUrl={customCardBack}
-                          isWinner={!!winnerInfo}
-                          winningHand={highlightedCards}
-                          stage={state.stage}
-                          amountWon={winnerInfo?.amountWon}
-                      />
-                  );
-              })}
-            </div>
+        <main className="relative flex-grow flex flex-col items-center justify-center p-2">
+            <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="relative w-full max-w-5xl aspect-[2/1] border-4 border-gold-accent/20 rounded-[100px] bg-green-900/40 shadow-2xl">
+                    
+                    {/* Render Seats and Opponents */}
+                    {Array.from({ length: Math.min(table.maxPlayers - 1, opponentSeatPositions.length) }).map((_, seatIndex) => {
+                        const opponent = opponents[seatIndex];
+                        const style = opponentSeatPositions[seatIndex];
 
-            {/* Middle Section: Community Cards & Pot */}
-            <div className="flex flex-col items-center justify-center my-2">
-                {state.pot > 0 && <PotDisplay amount={state.pot} format={formatDisplayAmount} />}
-                <CommunityCards cards={state.communityCards} stage={state.stage} winningHand={highlightedCards} />
-            </div>
+                        if (opponent) {
+                            const playerIndexInFullList = state.players.findIndex(p => p.id === opponent.id);
+                            const winnerInfo = state.winners?.find(w => w.playerId === opponent.id);
+                             return (
+                                <div key={opponent.id} className="absolute" style={style}>
+                                     <Player 
+                                          player={opponent} 
+                                          isDealer={playerIndexInFullList === state.dealerIndex} 
+                                          isMainPlayer={false} 
+                                          godMode={godMode} 
+                                          formatDisplayAmount={formatDisplayAmount} 
+                                          cardBackUrl={customCardBack}
+                                          isWinner={!!winnerInfo}
+                                          winningHand={highlightedCards}
+                                          stage={state.stage}
+                                          amountWon={winnerInfo?.amountWon}
+                                      />
+                                </div>
+                            );
+                        } else {
+                            return <SeatPlaceholder key={`seat-${seatIndex}`} style={style} />;
+                        }
+                    })}
+                   
 
-            {/* Bottom row: Opponents + Main Player */}
-             <div className="flex justify-center items-end gap-2 flex-wrap">
-                 {bottomOpponents.map((player) => {
-                  const playerIndexInFullList = state.players.findIndex(p => p.id === player.id);
-                  const winnerInfo = state.winners?.find(w => w.playerId === player.id);
-                  return (
-                       <Player 
-                          key={player.id}
-                          player={player} 
-                          isDealer={playerIndexInFullList === state.dealerIndex} 
-                          isMainPlayer={false} 
-                          godMode={godMode} 
-                          formatDisplayAmount={formatDisplayAmount} 
-                          cardBackUrl={customCardBack}
-                          isWinner={!!winnerInfo}
-                          winningHand={highlightedCards}
-                          stage={state.stage}
-                          amountWon={winnerInfo?.amountWon}
-                      />
-                  );
-                })}
-                 {mainPlayer && (
-                     <Player 
-                        player={mainPlayer} 
-                        isDealer={mainPlayerIndex === state.dealerIndex}
-                        isMainPlayer={true}
-                        godMode={godMode} 
-                        formatDisplayAmount={formatDisplayAmount} 
-                        cardBackUrl={customCardBack}
-                        isWinner={!!state.winners?.some(w => w.playerId === mainPlayer.id)}
-                        winningHand={highlightedCards}
-                        stage={state.stage}
-                        amountWon={state.winners?.find(w => w.playerId === mainPlayer.id)?.amountWon}
-                        bestHandName={bestHand?.name}
-                     />
-                 )}
+                    {/* Middle Section: Community Cards & Pot */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+                        {state.pot > 0 && <PotDisplay amount={state.pot} format={formatDisplayAmount} />}
+                        <CommunityCards cards={state.communityCards} stage={state.stage} winningHand={highlightedCards} />
+                    </div>
+
+                    {/* Main Player at the bottom */}
+                    {mainPlayer && (
+                         <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2">
+                            <Player 
+                                player={mainPlayer} 
+                                isDealer={mainPlayerIndex === state.dealerIndex}
+                                isMainPlayer={true}
+                                godMode={godMode} 
+                                formatDisplayAmount={formatDisplayAmount} 
+                                cardBackUrl={customCardBack}
+                                isWinner={!!state.winners?.some(w => w.playerId === mainPlayer.id)}
+                                winningHand={highlightedCards}
+                                stage={state.stage}
+                                amountWon={state.winners?.find(w => w.playerId === mainPlayer.id)?.amountWon}
+                                bestHandName={bestHand?.name}
+                            />
+                         </div>
+                    )}
+                 </div>
             </div>
         </main>
         
