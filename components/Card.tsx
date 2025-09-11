@@ -28,8 +28,8 @@ const Card: React.FC<CardProps> = ({ card, revealed, isHighlighted, overrideBack
   const imageUrl = revealed ? getCardImageUrl(card) : overrideBackUrl || assets.cardBackUrl;
 
   const sizeClasses = size === 'small'
-    ? 'w-8 h-12 sm:w-10 sm:h-14'
-    : 'w-12 h-[72px] sm:w-14 sm:h-[98px] md:w-16 md:h-24';
+    ? 'w-7 h-10 sm:w-10 sm:h-14'
+    : 'w-10 h-[60px] sm:w-14 sm:h-[98px] md:w-16 md:h-24';
 
   return (
     <div className={`${sizeClasses} bg-white rounded-md sm:rounded-lg shadow-lg transition-all duration-300 ${isHighlighted ? 'ring-2 ring-gold-accent shadow-glow-gold transform scale-105' : ''}`}>
