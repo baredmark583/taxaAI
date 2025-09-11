@@ -3,28 +3,28 @@
 @tailwind utilities;
 
 :root {
-  /* A more sophisticated dark theme for a premium poker feel */
-  --background-dark: #0f172a;      /* Deep dark blue for the new table background */
-  --background-light: #1e293b;     /* Lighter shade for modals, navbars */
-  --surface-color: #334155;        /* Player pods, button backgrounds */
-  --border-color: #475569;         /* Subtle borders */
+  /* Blue theme based on the user's reference screenshot */
+  --background-dark: #2c3e50;      /* Dark blue-gray table background */
+  --background-light: #34495e;     /* Slightly lighter blue-gray for modals */
+  --surface-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black for player pods */
+  --border-color: #567a9c;         /* A lighter blue for borders/highlights */
   
   /* Action & Accent Colors */
-  --primary-accent: #34D399;  /* A vibrant, confident green for positive actions */
-  --gold-accent: #FBBF24;     /* Rich gold for pots, winners, highlights */
-  --text-primary: #F8FAFC;        /* Off-white for primary text */
-  --text-secondary: #94A3B8;      /* Lighter gray for secondary text */
+  --primary-accent: #3498db;  /* A strong blue for Call button and highlights */
+  --gold-accent: #f1c40f;     /* Gold for pots, winners, highlights */
+  --text-primary: #ecf0f1;        /* Light gray/off-white for primary text */
+  --text-secondary: #bdc3c7;      /* Lighter gray for secondary text */
   
   /* Specific Action Colors */
-  --danger-color: #F87171;   /* Red for Fold */
-  --warning-color: #60A5FA;  /* A calm blue for Call/Check */
-  --success-color: var(--primary-accent); /* Green for Raise/Bet, aliased for consistency */
+  --danger-color: #e74c3c;   /* Red for Fold */
+  --warning-color: var(--primary-accent); /* Blue for Call/Check, aliased */
+  --success-color: #2ecc71; /* Green for Raise/Bet */
   
   /* Navigation Bar Colors */
   --button-inactive-bg: #1e293b; /* Same as light background */
   --button-inactive-text: var(--text-secondary);
   --button-active-bg: var(--gold-accent);
-  --button-active-text: #0f172a; /* Dark text on gold background */
+  --button-active-text: #2c3e50; /* Dark text on gold background */
 }
 
 

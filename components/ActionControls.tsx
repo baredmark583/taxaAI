@@ -29,12 +29,12 @@ const ActionButton = ({ children, onClick, className, disabled, iconSrc }: { chi
         onClick={onClick}
         disabled={disabled}
         className={cn(
-            "flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none",
+            "flex items-center justify-center gap-2 flex-1 h-14 rounded-md shadow-lg transition-all transform hover:scale-105 disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none px-4",
             className
         )}
     >
-        <UrlIcon src={iconSrc} className="w-7 h-7" />
-        <span className="text-xs font-bold uppercase">{children}</span>
+        <UrlIcon src={iconSrc} className="w-6 h-6" />
+        <span className="text-lg font-bold uppercase">{children}</span>
     </button>
 );
 

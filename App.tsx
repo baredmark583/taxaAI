@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useCallback, useEffect, FC, useContext } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
@@ -189,13 +190,14 @@ const AppContent: FC = () => {
     );
   }
 
+  const mainBgClass = pokerTable ? 'bg-background-dark' : 'bg-background-light';
+
   return (
     <>
       <Toaster position="top-center" richColors />
-       <div className="flex flex-col h-screen font-sans bg-background-dark text-text-primary">
-        <header className="h-[60px] flex-shrink-0 w-full" />
+       <div className={`flex flex-col h-screen font-sans text-text-primary ${mainBgClass}`}>
         
-        <main className={`flex-grow overflow-y-auto ${!pokerTable ? 'pb-16' : ''}`}>
+        <main className={`flex-grow overflow-hidden ${!pokerTable ? 'pb-16 overflow-y-auto' : ''}`}>
           {renderContent()}
         </main>
         

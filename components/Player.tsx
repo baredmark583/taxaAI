@@ -28,17 +28,16 @@ interface PlayerProps {
   bestHandName?: string;
 }
 
-const PlayerAvatar: React.FC<{ player: PlayerType, isActive: boolean }> = ({ player, isActive }) => {
-    const initials = player.name.substring(0, 2).toUpperCase();
+const PlayerAvatar: React.FC<{ player: PlayerType }> = ({ player }) => {
+    const initials = player.name.substring(0, 1).toUpperCase();
     
     return (
-        <div className={cn("relative w-16 h-16 rounded-lg bg-background-light flex items-center justify-center border-2", isActive ? 'border-primary-accent' : 'border-gold-accent/50')}>
+        <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-background-light flex items-center justify-center border-2 border-brand-border">
             {player.photoUrl ? (
-                <img src={player.photoUrl} alt={player.name} className="w-full h-full rounded-md object-cover" />
+                <img src={player.photoUrl} alt={player.name} className="w-full h-full rounded-full object-cover" />
             ) : (
-                <span className="text-xl font-bold text-text-primary">{initials}</span>
+                <span className="text-xl sm:text-2xl font-bold text-text-primary">{initials}</span>
             )}
-            <PlayerTimer isActive={isActive && !player.isFolded} />
         </div>
     );
 };
@@ -46,7 +45,9 @@ const PlayerAvatar: React.FC<{ player: PlayerType, isActive: boolean }> = ({ pla
 const PlayerTimer: React.FC<{ isActive: boolean }> = ({ isActive }) => {
   if (!isActive) return null;
   return (
-    <div className="absolute -inset-1 w-[calc(100%+4px)] h-[calc(100%+4px)] rounded-lg border-2 border-primary-accent animate-pulse" />
+    <div className="absolute bottom-0 left-0 w-full h-1 bg-primary-accent/30 rounded-full overflow-hidden">
+        <div className="h-full bg-primary-accent animate-progress-bar" style={{ animationDuration: '15s' }}></div>
+    </div>
   );
 };
 
@@ -65,36 +66,34 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     }
     
     const playerStateClasses = cn({
-        'opacity-40 grayscale': isFolded || isSittingOut,
-        'scale-105 z-10': isActive && isMainPlayer,
+        'opacity-50 grayscale': isFolded || isSittingOut,
         'transition-all duration-300': true,
     });
 
     return (
-        <div className={`relative flex flex-col items-center w-24 ${isMainPlayer ? 'scale-110' : ''} ${playerStateClasses}`}>
-
-            {isWinner && <div className="absolute -inset-2 animate-firework rounded-full pointer-events-none" />}
+        <div className={cn("relative flex flex-col items-center w-24 h-40 justify-end", playerStateClasses)}>
             
-            {isMainPlayer && bestHandName && stage !== GameStage.SHOWDOWN && (
-                <div className="absolute bottom-full mb-2 bg-black/70 backdrop-blur-sm text-gold-accent px-3 py-1 rounded-full text-xs font-semibold shadow-lg animate-fade-in whitespace-nowrap">
+            {bestHandName && stage !== GameStage.SHOWDOWN && (
+                <div className="absolute top-0 bg-black/70 backdrop-blur-sm text-gold-accent px-2 py-0.5 rounded-full text-xs font-semibold shadow-lg animate-fade-in whitespace-nowrap">
                     {bestHandName}
                 </div>
             )}
             
             <div className={cn(
-                "w-full bg-surface/70 backdrop-blur-sm border rounded-lg p-1 text-center shadow-lg",
-                isWinner ? 'border-gold-accent shadow-glow-gold' : 'border-transparent',
-                isActive ? 'border-primary-accent' : ''
+                "w-full bg-surface backdrop-blur-sm rounded-lg p-1 text-center shadow-lg relative",
+                isActive ? 'ring-2 ring-primary-accent' : ''
             )}>
-                 <PlayerAvatar player={player} isActive={isActive} />
-                <p className="text-xs font-bold truncate mt-1">{player.name}</p>
-                <p className={`text-sm font-mono ${player.stack > 0 ? 'text-white' : 'text-danger'}`}>{formatDisplayAmount(player.stack)}</p>
+                 <p className="text-xs sm:text-sm font-bold truncate h-4">{player.name}</p>
+                 <div className="my-1">
+                    <PlayerAvatar player={player} />
+                 </div>
+                <p className={`text-sm font-mono h-5 ${player.stack > 0 ? 'text-white' : 'text-danger'}`}>{formatDisplayAmount(player.stack)}</p>
+                <PlayerTimer isActive={isActive} />
             </div>
 
-
             {showHand && !isFolded && !isSittingOut && (
-                <div className={`flex items-center justify-center -mt-4 z-10`}>
-                    <div className="-mr-4 transform -rotate-12">
+                 <div className="flex items-center justify-center z-10 -mt-3">
+                    <div className="-mr-8 transform -rotate-12">
                         <Card 
                             card={player.hand[0]} 
                             revealed={showCards}
@@ -116,24 +115,21 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
             )}
             
             {isDealer && (
-                <div className="absolute top-0 right-0 -mt-2 -mr-2 text-white transform-gpu animate-pulse">
-                     <UrlIcon src={assets.iconDealerChip} className="w-6 h-6"/>
+                <div className="absolute top-2 right-2 text-white transform-gpu animate-pulse">
+                     <UrlIcon src={assets.iconDealerChip} className="w-5 h-5"/>
                 </div>
             )}
 
             {player.bet > 0 && !isFolded && (
-                 <div className="absolute -bottom-4 flex flex-col items-center">
-                    <div className="relative w-7 h-7">
-                        <UrlIcon src={assets.iconPokerChip} className="w-full h-full text-gold-accent"/>
-                    </div>
-                    <div className="bg-black/70 border border-gold-accent text-gold-accent px-2 py-0.5 rounded-full text-xs font-mono shadow-md -mt-2">
+                 <div className="absolute top-full -mt-2 flex flex-col items-center z-20">
+                    <div className="bg-black/70 border border-gold-accent text-gold-accent px-2 py-0.5 rounded-full text-xs font-mono shadow-md">
                         {formatDisplayAmount(player.bet)}
                     </div>
                 </div>
             )}
             
             {amountWon && amountWon > 0 && (
-                <div className="absolute top-1/2 -translate-y-1/2 text-success font-bold text-sm animate-prize-up whitespace-nowrap">
+                <div className="absolute top-1/2 -translate-y-1/2 text-success font-bold text-lg animate-prize-up whitespace-nowrap">
                     + {formatDisplayAmount(amountWon)}
                 </div>
             )}

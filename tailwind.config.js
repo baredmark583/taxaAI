@@ -73,10 +73,6 @@ export default {
           '60%': { transform: 'rotate(-1080deg)', offsetDistance: '100%', offsetPath: 'circle(45%)' },
           '100%': { transform: 'rotate(calc(var(--final-rotation, -1440deg) * -1))', offsetDistance: '100%', offsetPath: 'circle(45%)' },
         },
-        'player-timer': {
-          '0%': { 'stroke-dashoffset': '314' },
-          '100%': { 'stroke-dashoffset': '0' },
-        },
       },
       animation: {
         'fade-in': 'fade-in 0.3s ease-out forwards',
@@ -87,7 +83,6 @@ export default {
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'roulette-wheel-spin': 'roulette-wheel-spin 5s cubic-bezier(0.2, 0.8, 0.7, 1) forwards',
         'roulette-ball-spin': 'roulette-ball-spin 4.5s cubic-bezier(0.5, 0, 0.4, 1) forwards',
-        'player-timer': 'player-timer 15s linear forwards',
       }
     },
   },

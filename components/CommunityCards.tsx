@@ -9,7 +9,7 @@ interface CommunityCardsProps {
 }
 
 const CardPlaceholder: React.FC = () => (
-  <div className="w-10 h-[60px] sm:w-14 sm:h-[98px] md:w-16 md:h-24 bg-black/20 rounded-md sm:rounded-lg border-2 border-dashed border-surface" />
+  <div className="w-10 h-[60px] sm:w-14 sm:h-[98px] md:w-16 md:h-24 bg-black/20 rounded-md sm:rounded-lg" />
 );
 
 
