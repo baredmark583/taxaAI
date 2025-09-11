@@ -91,63 +91,63 @@ const Lobby: React.FC<LobbyProps> = ({ onEnterPoker, onEnterGame, realMoneyBalan
                 onClick={() => setActiveTab('POKER')}
                 className={`flex-1 py-3 text-center font-semibold transition-colors ${activeTab === 'POKER' ? 'text-primary-accent border-b-2 border-primary-accent' : 'text-text-secondary'}`}
              >
-                Покер
+                ПОКЕР
              </button>
              <button 
                 onClick={() => setActiveTab('GAMES')}
                 className={`flex-1 py-3 text-center font-semibold transition-colors ${activeTab === 'GAMES' ? 'text-primary-accent border-b-2 border-primary-accent' : 'text-text-secondary'}`}
-             >
-                Игры казино
+            >
+                КАЗИНО
              </button>
         </div>
 
         {/* Tab Content */}
-        <div className="p-2 sm:p-4 flex-grow overflow-y-auto">
-            {activeTab === 'POKER' ? (
-                <div className="space-y-3">
-                    {tablesToShow.length > 0 ? tablesToShow.map(table => (
-                        <div key={table.id} className="bg-surface/50 rounded-lg p-3 hover:bg-surface/80 transition-colors border border-transparent hover:border-primary-accent/50">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                                <div className="w-full sm:w-1/3">
+        <div className="flex-grow flex flex-col min-h-0">
+            {activeTab === 'POKER' && (
+                <div className="flex flex-col flex-grow p-2 overflow-y-auto">
+                    {tablesToShow.map(table => (
+                        <button key={table.id} onClick={() => onEnterPoker(table)} className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-surface/80 transition-colors">
+                            <div className="flex items-center gap-4 text-left">
+                                <img src={assets.iconPokerChip} alt="Poker" className="w-8 h-8"/>
+                                <div>
                                     <p className="font-bold text-text-primary">{table.name}</p>
-                                    <p className="text-sm text-text-secondary">No-Limit Hold'em</p>
-                                </div>
-                                <div className="flex items-center justify-between sm:justify-center gap-4 sm:gap-6 w-full sm:w-1/3">
-                                    <div className="text-center">
-                                        <p className="font-mono text-primary-accent text-sm sm:text-base">
-                                            {currencySymbol}{table.stakes.small.toLocaleString()}/{currencySymbol}{table.stakes.big.toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-text-secondary">Stakes</p>
-                                    </div>
-                                    <div className="flex items-center space-x-1">
-                                        <UsersIcon className="w-5 h-5 text-text-secondary" />
-                                        <span className="font-mono text-text-primary">{table.players}/{table.maxPlayers}</span>
-                                    </div>
-                                </div>
-                                <div className="w-full sm:w-1/3 flex justify-end">
-                                    <button
-                                        onClick={() => onEnterPoker(table)}
-                                        className="w-full sm:w-auto bg-success hover:bg-success/90 text-black font-bold px-4 py-2 rounded-md text-sm transition-all transform hover:scale-105 shadow-md hover:shadow-glow-success"
-                                    >
-                                        Join
-                                    </button>
+                                    <p className="text-sm text-text-secondary">Stakes: {currencySymbol}{table.stakes.small}/{currencySymbol}{table.stakes.big}</p>
                                 </div>
                             </div>
-                        </div>
-                    )) : (
-                      <div className="text-center py-8 text-text-secondary">
-                        <p>Нет доступных столов для этого режима.</p>
-                      </div>
-                    )}
+                            <div className="flex items-center gap-2 text-text-secondary">
+                                <UsersIcon className="w-5 h-5" />
+                                <span>{table.players}/{table.maxPlayers}</span>
+                            </div>
+                        </button>
+                    ))}
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <GameCard title="Слоты" description="Испытайте удачу на наших крипто-слотах!" icon={assets.iconSlotMachine} onPlay={() => onEnterGame('SLOTS', gameMode)} />
-                    <GameCard title="Рулетка" description="Делайте ставки и наблюдайте за вращением колеса." icon={assets.iconRoulette} onPlay={() => onEnterGame('ROULETTE', gameMode)} />
-                    <GameCard title="Лотерея" description="Купите билет и получите шанс выиграть джекпот!" icon="https://api.iconify.design/solar/ticket-bold-duotone.svg" onPlay={() => onEnterGame('LOTTERY', gameMode)} />
+            )}
+            {activeTab === 'GAMES' && (
+                <div className="flex flex-col flex-grow min-h-0">
+                    <div className="p-4 grid grid-cols-2 gap-4 overflow-y-auto">
+                        <GameCard 
+                            title="Слоты" 
+                            description="Испытайте удачу на наших крипто-слотах!"
+                            icon={assets.iconSlotMachine}
+                            onPlay={() => onEnterGame('SLOTS', gameMode)}
+                        />
+                        <GameCard 
+                            title="Рулетка" 
+                            description="Классическая игра с высокими ставками."
+                            icon={assets.iconRoulette}
+                            onPlay={() => onEnterGame('ROULETTE', gameMode)}
+                        />
+                        <GameCard 
+                            title="Лотерея" 
+                            description="Мгновенный выигрыш с нашим скретч-билетом."
+                            icon={'https://api.iconify.design/solar/ticket-bold-duotone.svg'}
+                            onPlay={() => onEnterGame('LOTTERY', gameMode)}
+                        />
+                    </div>
                 </div>
             )}
         </div>
+
       </div>
     </div>
   );

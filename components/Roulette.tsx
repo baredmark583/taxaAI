@@ -219,28 +219,30 @@ const Roulette: React.FC<RouletteProps> = ({ onExit, gameMode, realMoneyBalance,
             </div>
 
             {/* Betting Table */}
-             <div className="flex flex-col p-2 bg-green-900/80 border-2 border-gold-accent/50 rounded-lg">
-                <div className="grid grid-cols-13 gap-0.5">
-                    <div className="col-span-1 row-span-3 flex items-center justify-center"><BetButton label="0" betType="straight" betValue={0} className="bg-success/50"/></div>
-                    {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-danger/80" />)}
-                    <BetButton label="2:1" betType="col3" className="bg-gold-accent/30"/>
-                    {[2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-gray-800" />)}
-                    <BetButton label="2:1" betType="col2" className="bg-gold-accent/30"/>
-                    {[1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-danger/80"/>)}
-                    <BetButton label="2:1" betType="col1" className="bg-gold-accent/30"/>
-                </div>
-                <div className="grid grid-cols-6 gap-0.5 mt-0.5">
-                    <BetButton label="1-12" betType="dozen1" className="col-span-2 bg-gold-accent/30" />
-                    <BetButton label="13-24" betType="dozen2" className="col-span-2 bg-gold-accent/30" />
-                    <BetButton label="25-36" betType="dozen3" className="col-span-2 bg-gold-accent/30" />
-                </div>
-                <div className="grid grid-cols-6 gap-0.5 mt-0.5">
-                    <BetButton label="1-18" betType="low" />
-                    <BetButton label="Even" betType="even" />
-                    <BetButton label="Red" betType="red" className="bg-danger/80"/>
-                    <BetButton label="Black" betType="black" className="bg-gray-800"/>
-                    <BetButton label="Odd" betType="odd" />
-                    <BetButton label="19-36" betType="high" />
+             <div className="p-2 bg-green-900/80 border-2 border-gold-accent/50 rounded-lg overflow-x-auto">
+                <div className="min-w-[500px]">
+                    <div className="grid grid-cols-13 gap-0.5">
+                        <div className="col-span-1 row-span-3 flex items-center justify-center"><BetButton label="0" betType="straight" betValue={0} className="bg-success/50"/></div>
+                        {[3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-danger/80" />)}
+                        <BetButton label="2:1" betType="col3" className="bg-gold-accent/30"/>
+                        {[2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-gray-800" />)}
+                        <BetButton label="2:1" betType="col2" className="bg-gold-accent/30"/>
+                        {[1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34].map(n => <BetButton key={n} label={`${n}`} betType="straight" betValue={n} className="bg-danger/80"/>)}
+                        <BetButton label="2:1" betType="col1" className="bg-gold-accent/30"/>
+                    </div>
+                    <div className="grid grid-cols-6 gap-0.5 mt-0.5">
+                        <BetButton label="1-12" betType="dozen1" className="col-span-2 bg-gold-accent/30" />
+                        <BetButton label="13-24" betType="dozen2" className="col-span-2 bg-gold-accent/30" />
+                        <BetButton label="25-36" betType="dozen3" className="col-span-2 bg-gold-accent/30" />
+                    </div>
+                    <div className="grid grid-cols-6 gap-0.5 mt-0.5">
+                        <BetButton label="1-18" betType="low" />
+                        <BetButton label="Even" betType="even" />
+                        <BetButton label="Red" betType="red" className="bg-danger/80"/>
+                        <BetButton label="Black" betType="black" className="bg-gray-800"/>
+                        <BetButton label="Odd" betType="odd" />
+                        <BetButton label="19-36" betType="high" />
+                    </div>
                 </div>
             </div>
         </div>
