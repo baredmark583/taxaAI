@@ -24,12 +24,12 @@ const PlayerAvatar: React.FC<{ player: PlayerType }> = ({ player }) => {
     const initials = player.name.substring(0, 2).toUpperCase();
     
     if (player.photoUrl) {
-        return <img src={player.photoUrl} alt={player.name} className="w-12 h-12 rounded-full border-2 border-gold-accent object-cover bg-background-light" />;
+        return <img src={player.photoUrl} alt={player.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gold-accent object-cover bg-background-light" />;
     }
     
     return (
-        <div className="w-12 h-12 rounded-full border-2 border-gold-accent bg-background-light flex items-center justify-center">
-            <span className="text-lg font-bold text-text-primary">{initials}</span>
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gold-accent bg-background-light flex items-center justify-center">
+            <span className="text-base sm:text-lg font-bold text-text-primary">{initials}</span>
         </div>
     );
 };
@@ -78,7 +78,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
     });
 
     return (
-        <div className={`relative flex flex-col items-center ${isMainPlayer ? 'w-32' : 'w-24'} ${playerStateClasses}`}>
+        <div className={`relative flex flex-col items-center ${isMainPlayer ? 'w-28 sm:w-32' : 'w-20 sm:w-24'} ${playerStateClasses}`}>
             {isWinner && <div className="absolute -inset-2 animate-firework rounded-full pointer-events-none" />}
             
             {isMainPlayer && bestHandName && (
@@ -88,9 +88,9 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
             )}
 
             {/* 1. Cards */}
-            <div className={`relative flex items-end justify-center h-16 ${isMainPlayer ? '' : 'transform scale-90 -mb-2'}`}>
+            <div className={`relative flex items-end justify-center h-12 sm:h-16 ${isMainPlayer ? '' : 'transform scale-90 -mb-2'}`}>
                 {showHand && !isFolded && (
-                    <div className={`flex items-center ${isMainPlayer ? '-space-x-12' : '-space-x-8'}`}>
+                    <div className={`flex items-center ${isMainPlayer ? '-space-x-10 sm:-space-x-12' : '-space-x-8'}`}>
                         {player.hand?.[0] && (
                             <div className="transform -rotate-12">
                                 <Card 
@@ -118,7 +118,7 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
             </div>
 
             {/* 2. Avatar & Info Bubble (pulled up to overlap cards) */}
-            <div className="relative flex flex-col items-center -mt-8 w-full">
+            <div className="relative flex flex-col items-center -mt-6 sm:-mt-8 w-full">
                 <div className="relative z-10">
                     <div className="relative">
                         <PlayerAvatar player={player} />
@@ -132,12 +132,12 @@ const Player: React.FC<PlayerProps> = ({ player, isMainPlayer, isDealer, godMode
                 </div>
 
                 <div className={cn(
-                    "w-full max-w-[120px] bg-surface/80 backdrop-blur-sm border rounded-lg px-3 py-1 text-center -mt-6 shadow-lg",
+                    "w-full max-w-[120px] bg-surface/80 backdrop-blur-sm border rounded-lg px-2 sm:px-3 py-1 text-center -mt-5 sm:-mt-6 shadow-lg",
                     isWinner ? 'border-gold-accent shadow-glow-gold' : 'border-brand-border',
                     isActive ? 'border-primary-accent' : 'border-brand-border'
                 )}>
-                    <p className="text-sm font-bold truncate pt-6">{player.name}</p>
-                    <p className={`text-base font-mono ${player.stack > 0 ? 'text-white' : 'text-danger'}`}>{formatDisplayAmount(player.stack)}</p>
+                    <p className="text-xs sm:text-sm font-bold truncate pt-5 sm:pt-6">{player.name}</p>
+                    <p className={`text-sm sm:text-base font-mono ${player.stack > 0 ? 'text-white' : 'text-danger'}`}>{formatDisplayAmount(player.stack)}</p>
                 </div>
             </div>
 

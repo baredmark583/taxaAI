@@ -149,7 +149,7 @@ const GameTable: React.FC<GameTableProps> = ({ table, onExit }) => {
               })}
 
               {mainPlayer && (
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[28%] sm:translate-y-[20%] z-20">
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[35%] sm:translate-y-[20%] z-20">
                        <Player 
                           player={mainPlayer} 
                           isDealer={mainPlayerIndex === state.dealerIndex}
