@@ -4,27 +4,27 @@
 
 :root {
   /* A more sophisticated dark theme for a premium poker feel */
-  --background-dark: #121820;      /* Very dark, slightly blue-tinted background */
-  --background-light: #1A222C;     /* Lighter shade for modals, navbars */
-  --surface-color: #243040;        /* Player pods, button backgrounds */
-  --border-color: #4A5568;         /* Subtle borders */
+  --background-dark: #0f172a;      /* Deep dark blue for the new table background */
+  --background-light: #1e293b;     /* Lighter shade for modals, navbars */
+  --surface-color: #334155;        /* Player pods, button backgrounds */
+  --border-color: #475569;         /* Subtle borders */
   
   /* Action & Accent Colors */
-  --primary-accent: #48BB78;  /* A vibrant, confident green for positive actions (Raise, Bet) */
-  --gold-accent: #ECC94B;     /* Rich gold for pots, winners, highlights */
-  --text-primary: #EDF2F7;        /* Off-white for primary text */
-  --text-secondary: #A0AEC0;      /* Lighter gray for secondary text */
+  --primary-accent: #34D399;  /* A vibrant, confident green for positive actions */
+  --gold-accent: #FBBF24;     /* Rich gold for pots, winners, highlights */
+  --text-primary: #F8FAFC;        /* Off-white for primary text */
+  --text-secondary: #94A3B8;      /* Lighter gray for secondary text */
   
   /* Specific Action Colors */
-  --danger-color: #E53E3E;   /* Red for Fold */
-  --warning-color: #4299E1;  /* A calm blue for Call/Check */
+  --danger-color: #F87171;   /* Red for Fold */
+  --warning-color: #60A5FA;  /* A calm blue for Call/Check */
   --success-color: var(--primary-accent); /* Green for Raise/Bet, aliased for consistency */
   
   /* Navigation Bar Colors */
-  --button-inactive-bg: #1A222C; /* Same as light background */
+  --button-inactive-bg: #1e293b; /* Same as light background */
   --button-inactive-text: var(--text-secondary);
   --button-active-bg: var(--gold-accent);
-  --button-active-text: #121820; /* Dark text on gold background */
+  --button-active-text: #0f172a; /* Dark text on gold background */
 }
 
 

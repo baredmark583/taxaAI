@@ -50,7 +50,7 @@ interface AssetContextType {
 // Default asset values
 const defaultAssets: GameAssets = {
   cardBackUrl: 'https://raw.githubusercontent.com/htdebeer/SVG-cards/main/cards/Red_back.svg',
-  tableBackgroundUrl: 'https://i.imgur.com/Q9x2s70.png',
+  tableBackgroundUrl: 'https://i.imgur.com/M8f2a0U.jpeg',
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
@@ -62,13 +62,13 @@ const defaultAssets: GameAssets = {
   iconExit: 'https://api.iconify.design/solar/logout-3-linear.svg',
   iconSettings: 'https://api.iconify.design/solar/settings-linear.svg',
   iconUsers: 'https://api.iconify.design/solar/users-group-rounded-linear.svg',
-  iconDealerChip: 'https://api.iconify.design/mdi/alpha-d-circle.svg',
+  iconDealerChip: 'https://api.iconify.design/mdi/alpha-d-circle-outline.svg',
   iconPokerChip: 'https://api.iconify.design/mdi/poker-chip.svg',
   iconSlotMachine: 'https://api.iconify.design/solar/slot-machine-bold-duotone.svg',
   iconRoulette: 'https://api.iconify.design/mdi/roulette.svg',
-  iconFold: 'https://api.iconify.design/mdi/hand-back-right-off-outline.svg',
-  iconCall: 'https://api.iconify.design/mdi/check.svg',
-  iconRaise: 'https://api.iconify.design/mdi/arrow-up-bold-box-outline.svg',
+  iconFold: 'https://api.iconify.design/mdi/close-thick.svg',
+  iconCall: 'https://api.iconify.design/mdi/check-bold.svg',
+  iconRaise: 'https://api.iconify.design/mdi/arrow-up-bold.svg',
   iconBank: 'https://api.iconify.design/solar/wallet-money-bold-duotone.svg',
 };
 

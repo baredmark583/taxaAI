@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Card as CardType, GameStage, Suit, Rank } from '../types';
 import Card from './Card';
@@ -7,9 +5,13 @@ import Card from './Card';
 interface CommunityCardsProps {
   cards: CardType[];
   stage: GameStage;
-  // FIX: Use the imported `CardType` for type annotation instead of the component name `Card`.
   winningHand?: CardType[];
 }
+
+const CardPlaceholder: React.FC = () => (
+  <div className="w-10 h-[60px] sm:w-14 sm:h-[98px] md:w-16 md:h-24 bg-black/20 rounded-md sm:rounded-lg border-2 border-dashed border-surface" />
+);
+
 
 const CommunityCards: React.FC<CommunityCardsProps> = ({ cards, stage, winningHand = [] }) => {
   const isCardInWinningHand = (card: CardType) => {
@@ -21,20 +23,22 @@ const CommunityCards: React.FC<CommunityCardsProps> = ({ cards, stage, winningHa
     stage === GameStage.TURN ? 4 :
     stage === GameStage.RIVER || stage === GameStage.SHOWDOWN ? 5 : 0;
     
-  const paddedCards = [...cards];
-  while (paddedCards.length < 5) {
-      paddedCards.push({ suit: Suit.SPADES, rank: Rank.ACE }); // Placeholder
-  }
+  const displayCards = Array(5).fill(null).map((_, i) => cards[i] || null);
+
 
   return (
-    <div className="flex justify-center items-center space-x-1 sm:space-x-2 my-4 h-24">
-      {paddedCards.map((card, index) => (
-        <div key={index} className={`transition-all duration-500 ${index < revealedCount ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-           <Card 
-             card={card} 
-             revealed={index < revealedCount}
-             isHighlighted={stage === GameStage.SHOWDOWN && isCardInWinningHand(card)}
-           />
+    <div className="flex justify-center items-center space-x-1 sm:space-x-2 my-2 h-24">
+      {displayCards.map((card, index) => (
+        <div key={index} className={`transition-all duration-500 ${index < revealedCount ? 'opacity-100 scale-100' : 'opacity-100 scale-100'}`}>
+            {index < revealedCount && card ? (
+                 <Card 
+                     card={card} 
+                     revealed={true}
+                     isHighlighted={stage === GameStage.SHOWDOWN && isCardInWinningHand(card)}
+                 />
+            ) : (
+                <CardPlaceholder />
+            )}
         </div>
       ))}
     </div>

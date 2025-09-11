@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Player, PlayerAction } from '../types';
-import { cn } from '@/lib/utils'; // Assuming you have a cn utility
+import { cn } from '@/lib/utils';
+import { AssetContext } from '../contexts/AssetContext';
+
+const UrlIcon = ({ src, className }: { src: string; className?: string }) => {
+  if (!src) return <div className={className} />;
+  return (
+    <div
+      className={`icon-mask ${className}`}
+      style={{ '--icon-url': `url(${src})` } as React.CSSProperties}
+    />
+  );
+};
 
 interface ActionControlsProps {
   player: Player;
@@ -13,21 +24,23 @@ interface ActionControlsProps {
   formatDisplayAmount: (amount: number) => string;
 }
 
-const ActionButton = ({ children, onClick, className, ...props }: React.ComponentProps<'button'>) => (
+const ActionButton = ({ children, onClick, className, disabled, iconSrc }: { children: React.ReactNode, onClick: () => void, className?: string, disabled?: boolean, iconSrc: string }) => (
     <button
         onClick={onClick}
+        disabled={disabled}
         className={cn(
-            "flex-1 py-4 text-lg font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 uppercase disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none",
+            "flex flex-col items-center justify-center gap-1 w-20 h-16 rounded-lg shadow-lg transition-all transform hover:scale-105 disabled:bg-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none",
             className
         )}
-        {...props}
     >
-        {children}
+        <UrlIcon src={iconSrc} className="w-7 h-7" />
+        <span className="text-xs font-bold uppercase">{children}</span>
     </button>
 );
 
 
 const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAction, currentBet, pot, smallBlind, bigBlind, formatDisplayAmount }) => {
+  const { assets } = useContext(AssetContext);
   const [isBetting, setIsBetting] = useState(false);
   
   const canCheck = player.bet === currentBet;
@@ -58,7 +71,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
 
     return (
         <div className="w-full max-w-lg p-3 bg-background-light/80 backdrop-blur-md border border-brand-border rounded-lg shadow-2xl flex flex-col items-center animate-fade-in">
-            <div className="flex justify-between w-full mb-3 text-sm">
+            <div className="flex justify-between w-full mb-3 text-xs">
                 <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.5), maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">1/2 Pot</button>
                 <button onClick={() => setBetAmount(Math.max(minBet, Math.min(Math.round(pot * 0.75), maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">3/4 Pot</button>
                 <button onClick={() => setBetAmount(Math.max(minBet, Math.min(pot, maxBet)))} className="bg-surface hover:bg-background-light px-3 py-1 rounded-md text-text-secondary hover:text-white transition-colors">Pot</button>
@@ -80,7 +93,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
             <div className="flex items-center justify-between w-full space-x-4 mt-4">
                 <button onClick={() => setIsBetting(false)} className="px-6 py-3 bg-gray-600 hover:bg-gray-500 rounded-lg text-white font-semibold flex-1 transition-transform transform hover:scale-105">Отмена</button>
                 <button onClick={handleBetAction} className="px-6 py-3 bg-success text-white rounded-lg font-bold text-lg shadow-lg shadow-success/20 hover:shadow-glow-success flex-1 transition-all transform hover:scale-105">
-                    {currentBet > 0 ? 'Raise' : 'Bet'} {formatDisplayAmount(actualBetAmount)}
+                    {currentBet > 0 ? 'Raise to' : 'Bet'} {formatDisplayAmount(actualBetAmount)}
                 </button>
             </div>
         </div>
@@ -92,6 +105,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       <ActionButton
         onClick={() => onAction({ type: 'fold' })}
         className="bg-danger text-white hover:shadow-glow-danger"
+        iconSrc={assets.iconFold}
       >
         Fold
       </ActionButton>
@@ -99,14 +113,16 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
       {canCheck ? (
         <ActionButton
           onClick={() => onAction({ type: 'check' })}
-          className="bg-warning text-black"
+          className="bg-warning text-white"
+          iconSrc={assets.iconCall}
         >
           Check
         </ActionButton>
       ) : (
         <ActionButton
           onClick={() => onAction({ type: 'call' })}
-          className="bg-warning text-black"
+          className="bg-warning text-white"
+          iconSrc={assets.iconCall}
         >
           Call {toCall > 0 ? formatDisplayAmount(toCall) : ''}
         </ActionButton>
@@ -116,6 +132,7 @@ const ActionControls: React.FC<ActionControlsProps> = ({ player, isActive, onAct
         onClick={() => setIsBetting(true)}
         disabled={minRaise > player.stack + player.bet}
         className="bg-success text-white hover:shadow-glow-success"
+        iconSrc={assets.iconRaise}
       >
         {currentBet > 0 ? 'Raise' : 'Bet'}
       </ActionButton>
