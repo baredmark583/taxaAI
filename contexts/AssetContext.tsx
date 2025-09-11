@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
-import { Suit, Rank, SlotSymbol, GameAssets } from '../types';
+import { Suit, Rank, SlotSymbol, GameAssets, LotteryPrize } from '../types';
 
 const API_URL = (import.meta as any).env.VITE_API_URL;
 
@@ -41,6 +41,16 @@ const defaultSlotSymbols: SlotSymbol[] = [
     { id: 4, name: 'CHERRY', imageUrl: 'https://www.svgrepo.com/show/198816/slot-machine-casino.svg', payout: 10, weight: 4 },
 ];
 
+const defaultLotteryPrizes: LotteryPrize[] = [
+    { label: 'Джекпот!', multiplier: 20000, weight: 1 },
+    { label: 'Крупный выигрыш', multiplier: 500, weight: 5 },
+    { label: 'Приз', multiplier: 300, weight: 10 },
+    { label: 'Малый приз', multiplier: 200, weight: 20 },
+    { label: 'Возврат билета', multiplier: 100, weight: 150 },
+    { label: 'Не повезло', multiplier: 0, weight: 814 },
+];
+
+
 // Define the context type
 interface AssetContextType {
   assets: GameAssets;
@@ -54,6 +64,10 @@ const defaultAssets: GameAssets = {
   godModePassword: 'reveal_cards_42',
   cardFaces: generateDefaultCardFaces(),
   slotSymbols: defaultSlotSymbols,
+  lotteryTicketPricePlayMoney: 100,
+  lotteryTicketPriceRealMoney: 0.5,
+  lotteryPrizesPlayMoney: defaultLotteryPrizes,
+  lotteryPrizesRealMoney: defaultLotteryPrizes,
   // Default Icons - updated for a sleeker look
   iconFavicon: 'https://api.iconify.design/mdi/poker-chip.svg',
   iconManifest: 'https://api.iconify.design/mdi/poker-chip.svg',

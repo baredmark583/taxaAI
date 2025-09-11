@@ -1,91 +1,16 @@
-
-
-
 import React, { useState, useCallback, useEffect, FC, useContext } from 'react';
 import Lobby from './components/Lobby';
 import GameTable from './components/GameTable';
 import Slots from './components/Slots';
 import Roulette from './components/Roulette';
+import Lottery from './components/Lottery';
 import WalletModal from './components/WalletModal';
 import { AssetProvider, AssetContext } from './contexts/AssetContext';
-import { TableConfig } from './types';
+import { TableConfig, GameMode } from './types';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { Toaster } from 'sonner';
 
-// --- Start of components defined in-file to avoid creating new files ---
-
-const UrlIcon = ({ src, className }: { src: string; className?: string }) => {
-  if (!src) return <div className={className} />; // Return an empty div if src is missing
-  return (
-    <div
-      className={`icon-mask ${className}`}
-      style={{ '--icon-url': `url(${src})` } as React.CSSProperties}
-    />
-  );
-};
-
-
-type Tab = 'POKER' | 'SLOTS' | 'ROULETTE';
-
-interface BottomNavBarProps {
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
-  onBankClick: () => void;
-}
-
-const NavButton = ({ label, icon, isActive, onClick }: { label: string; icon: React.ReactNode; isActive: boolean; onClick: () => void }) => {
-  const baseClasses = 'flex-1 flex flex-col items-center justify-center p-2 transition-colors duration-200 ease-in-out text-center w-full';
-  const activeClasses = 'bg-button-active-bg text-button-active-text';
-  const inactiveClasses = 'bg-button-inactive-bg text-button-inactive-text hover:bg-opacity-80';
-
-  return (
-    <button
-      onClick={onClick}
-      className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
-    >
-      {icon}
-      <span className="text-xs font-bold mt-1 uppercase">{label}</span>
-    </button>
-  );
-};
-
-const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, onTabChange, onBankClick }) => {
-  const { assets } = useContext(AssetContext);
-
-  return (
-    <footer className="fixed bottom-0 left-0 right-0 h-16 bg-background-light border-t border-brand-border flex z-50">
-      <NavButton
-        label="Покер"
-        icon={<UrlIcon src={assets.iconPokerChip} className="w-6 h-6" />}
-        isActive={activeTab === 'POKER'}
-        onClick={() => onTabChange('POKER')}
-      />
-      <NavButton
-        label="Рулетка"
-        icon={<UrlIcon src={assets.iconRoulette} className="w-6 h-6" />}
-        isActive={activeTab === 'ROULETTE'}
-        onClick={() => onTabChange('ROULETTE')}
-      />
-      <NavButton
-        label="Слоты"
-        icon={<UrlIcon src={assets.iconSlotMachine} className="w-6 h-6" />}
-        isActive={activeTab === 'SLOTS'}
-        onClick={() => onTabChange('SLOTS')}
-      />
-      <NavButton
-        label="Банк"
-        icon={<UrlIcon src={assets.iconBank} className="w-6 h-6" />}
-        isActive={false} // The bank button opens a modal and is never the "active tab"
-        onClick={onBankClick}
-      />
-    </footer>
-  );
-};
-
-// --- End of in-file components ---
-
-
-type ActiveGame = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE';
+type ActiveScreen = 'LOBBY' | 'POKER' | 'SLOTS' | 'ROULETTE' | 'LOTTERY';
 
 const App: FC = () => {
   return (
@@ -114,14 +39,16 @@ const App: FC = () => {
 
 
 const AppContent: FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>('POKER');
+  const [activeScreen, setActiveScreen] = useState<ActiveScreen>('LOBBY');
+  const [activeGameMode, setActiveGameMode] = useState<GameMode>(GameMode.REAL_MONEY);
   const [pokerTable, setPokerTable] = useState<TableConfig | null>(null);
   
-  const [realMoneyBalance, setRealMoneyBalance] = useState(0.5);
+  const [realMoneyBalance, setRealMoneyBalance] = useState(0);
   const [playMoneyBalance, setPlayMoneyBalance] = useState(10000);
   
   const [isInitializing, setIsInitializing] = useState(true);
   const [isWalletModalOpen, setWalletModalOpen] = useState(false);
+  const { assets } = useContext(AssetContext);
 
   useEffect(() => {
     const TWebApp = (window as any).Telegram?.WebApp;
@@ -133,51 +60,72 @@ const AppContent: FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleEnterPoker = useCallback((table: TableConfig) => {
-    setPokerTable(table);
-  }, []);
-
-  const handleExitPokerTable = useCallback(() => {
-    setPokerTable(null);
+  const handleEnterGame = useCallback((screen: ActiveScreen, mode: GameMode) => {
+    setActiveGameMode(mode);
+    setActiveScreen(screen);
   }, []);
   
-  const handleExitGame = useCallback(() => {
-      setActiveTab('POKER');
+  const handleEnterPoker = useCallback((table: TableConfig) => {
+    setPokerTable(table);
+    setActiveScreen('POKER');
   }, []);
 
-  const renderContent = () => {
-    if (pokerTable) {
-        return <GameTable table={pokerTable} onExit={handleExitPokerTable} />;
-    }
+  const handleExitGame = useCallback(() => {
+    setPokerTable(null);
+    setActiveScreen('LOBBY');
+  }, []);
+  
 
-    switch (activeTab) {
+  const renderContent = () => {
+    switch (activeScreen) {
         case 'POKER':
-            return (
-                <Lobby
-                    onEnterPoker={handleEnterPoker}
-                    realMoneyBalance={realMoneyBalance}
-                    playMoneyBalance={playMoneyBalance}
-                    setRealMoneyBalance={setRealMoneyBalance}
-                />
-            );
+            if (pokerTable) {
+                return <GameTable table={pokerTable} onExit={handleExitGame} />;
+            }
+            // Fallback to lobby if no table is selected
+            setActiveScreen('LOBBY');
+            return null;
+
         case 'SLOTS':
-            return (
-                <Slots
-                    onExit={handleExitGame}
-                    balance={playMoneyBalance}
-                    setBalance={setPlayMoneyBalance}
-                />
-            );
+            return <Slots 
+                        onExit={handleExitGame} 
+                        gameMode={activeGameMode}
+                        realMoneyBalance={realMoneyBalance}
+                        setRealMoneyBalance={setRealMoneyBalance}
+                        playMoneyBalance={playMoneyBalance}
+                        setPlayMoneyBalance={setPlayMoneyBalance}
+                    />
         case 'ROULETTE':
-            return (
-                <Roulette
-                    onExit={handleExitGame}
-                    balance={playMoneyBalance}
-                    setBalance={setPlayMoneyBalance}
-                />
-            );
+             return <Roulette 
+                        onExit={handleExitGame} 
+                        gameMode={activeGameMode}
+                        realMoneyBalance={realMoneyBalance}
+                        setRealMoneyBalance={setRealMoneyBalance}
+                        playMoneyBalance={playMoneyBalance}
+                        setPlayMoneyBalance={setPlayMoneyBalance}
+                    />
+        case 'LOTTERY':
+             return <Lottery
+                        onExit={handleExitGame} 
+                        gameMode={activeGameMode}
+                        realMoneyBalance={realMoneyBalance}
+                        setRealMoneyBalance={setRealMoneyBalance}
+                        playMoneyBalance={playMoneyBalance}
+                        setPlayMoneyBalance={setPlayMoneyBalance}
+                        ticketPricePlayMoney={assets.lotteryTicketPricePlayMoney}
+                        ticketPriceRealMoney={assets.lotteryTicketPriceRealMoney}
+                        prizesPlayMoney={assets.lotteryPrizesPlayMoney}
+                        prizesRealMoney={assets.lotteryPrizesRealMoney}
+                    />;
+        case 'LOBBY':
         default:
-            return <Lobby onEnterPoker={handleEnterPoker} realMoneyBalance={realMoneyBalance} playMoneyBalance={playMoneyBalance} setRealMoneyBalance={setRealMoneyBalance}/>;
+            return <Lobby
+                        onEnterPoker={handleEnterPoker}
+                        onEnterGame={handleEnterGame}
+                        realMoneyBalance={realMoneyBalance}
+                        playMoneyBalance={playMoneyBalance}
+                        onBankClick={() => setWalletModalOpen(true)}
+                    />
     }
   };
   
@@ -190,22 +138,16 @@ const AppContent: FC = () => {
     );
   }
 
-  const mainBgClass = pokerTable ? 'bg-background-dark' : 'bg-background-light';
+  const mainBgClass = activeScreen === 'POKER' ? 'bg-background-dark' : 'bg-black';
 
   return (
     <>
       <Toaster position="top-center" richColors />
        <div className={`flex flex-col h-screen font-sans text-text-primary ${mainBgClass}`}>
         
-        <main className={`flex-grow overflow-hidden ${!pokerTable ? 'pb-16 overflow-y-auto' : ''}`}>
+        <main className="flex-grow overflow-hidden">
           {renderContent()}
         </main>
-        
-        {!pokerTable && <BottomNavBar 
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          onBankClick={() => setWalletModalOpen(true)}
-        />}
         
         <WalletModal 
           isOpen={isWalletModalOpen}

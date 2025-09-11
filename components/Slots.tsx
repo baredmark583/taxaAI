@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { ExitIcon } from './Icons';
 import { AssetContext } from '../contexts/AssetContext';
-import { SlotSymbol } from '../types';
+import { SlotSymbol, GameMode } from '../types';
 import { toast } from 'sonner';
 
 interface SlotsProps {
   onExit: () => void;
-  balance: number;
-  setBalance: (updater: (prevBalance: number) => number) => void;
+  gameMode: GameMode;
+  realMoneyBalance: number;
+  playMoneyBalance: number;
+  setRealMoneyBalance: (updater: (prevBalance: number) => number) => void;
+  setPlayMoneyBalance: (updater: (prevBalance: number) => number) => void;
 }
 
 // Reel sub-component
@@ -64,11 +67,16 @@ const WIN_LINES = [
 ];
 const NUM_LINES = WIN_LINES.length;
 
-const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
+const Slots: React.FC<SlotsProps> = ({ onExit, gameMode, realMoneyBalance, playMoneyBalance, setRealMoneyBalance, setPlayMoneyBalance }) => {
   const { assets } = useContext(AssetContext);
   const { slotSymbols } = assets;
+  
+  const isRealMoney = gameMode === GameMode.REAL_MONEY;
+  const balance = isRealMoney ? realMoneyBalance : playMoneyBalance;
+  const setBalance = isRealMoney ? setRealMoneyBalance : setPlayMoneyBalance;
+  const currencySymbol = isRealMoney ? 'TON' : '$';
 
-  const betLevels = [10, 25, 50, 100, 250, 500];
+  const betLevels = isRealMoney ? [0.1, 0.25, 0.5, 1, 2.5, 5] : [10, 25, 50, 100, 250, 500];
   const [betIndex, setBetIndex] = useState(2);
   const betAmount = betLevels[betIndex];
 
@@ -118,7 +126,6 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
 
     const spinDuration = 3500;
     
-    // Generate a 3x3 grid of results [reel][row]
     const results: SlotSymbol[][] = Array(3).fill(null).map(() => 
         Array(3).fill(null).map(() => 
             weightedSymbols.current[Math.floor(Math.random() * weightedSymbols.current.length)]
@@ -128,14 +135,12 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
     const newReels: SlotSymbol[][] = Array(3).fill(null).map((_, reelIndex) => {
         const strip = [];
         const reelLength = 30;
-        // Fill with random symbols, leaving space for the 3 results
         for (let j = 0; j < reelLength - 3; j++) {
             strip.push(slotSymbols[Math.floor(Math.random() * slotSymbols.length)]);
         }
-        // Place the 3 results for this reel at the end of the strip
-        strip.push(results[reelIndex][0]); // Top result
-        strip.push(results[reelIndex][1]); // Middle result
-        strip.push(results[reelIndex][2]); // Bottom result
+        strip.push(results[reelIndex][0]);
+        strip.push(results[reelIndex][1]);
+        strip.push(results[reelIndex][2]);
         return strip;
     });
 
@@ -143,7 +148,6 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
 
     setTimeout(() => {
       const finalReelSymbols = results;
-      
       const betPerLine = betAmount / NUM_LINES;
       let totalPayout = 0;
       const linesThatWon: number[] = [];
@@ -159,21 +163,18 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
       });
       
       if (totalPayout > 0) {
-        const roundedPayout = Math.round(totalPayout);
+        const roundedPayout = isRealMoney ? parseFloat(totalPayout.toFixed(4)) : Math.round(totalPayout);
         setWinAmount(roundedPayout);
         setBalance(prev => prev + roundedPayout);
-        setWinningLines(linesThatWon);
-        toast.success(`Вы выиграли $${roundedPayout.toLocaleString()}!`);
+        toast.success(`Вы выиграли ${currencySymbol}${roundedPayout.toLocaleString()}!`);
       }
       
       setSpinning(false);
       
     }, spinDuration);
-  }, [spinning, balance, betAmount, isAutoSpinning, slotSymbols, setBalance, setSpinning, setWinAmount, setWinningLines, setReels]);
+  }, [spinning, balance, betAmount, isAutoSpinning, slotSymbols, setBalance, isRealMoney, currencySymbol]);
   
-  // Effect for handling the autospin loop
   useEffect(() => {
-    // FIX: Replace NodeJS.Timeout with ReturnType<typeof setTimeout> to resolve issue with missing global NodeJS type.
     let autoSpinTimeout: ReturnType<typeof setTimeout>;
 
     if (isAutoSpinning && !spinning) {
@@ -182,10 +183,9 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
         toast.info("Автоспин остановлен: недостаточно средств.");
         return;
       }
-      // Add a small delay between spins for better UX
       autoSpinTimeout = setTimeout(() => {
         handleSpin();
-      }, 1000); // 1 second delay
+      }, 1000);
     }
 
     return () => {
@@ -208,10 +208,12 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
     setIsAutoSpinning(prev => !prev);
   };
 
+  const formatAmount = (amount: number) => {
+      return isRealMoney ? amount.toFixed(2) : amount.toLocaleString();
+  }
+
   return (
-    <div className="w-full h-full bg-cover bg-center text-white flex flex-col items-center justify-center p-4 font-sans"
-      style={{ backgroundImage: `url(${assets.tableBackgroundUrl})`}}
-    >
+    <div className="w-full h-full text-white flex flex-col items-center justify-center p-4 font-sans">
        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       
       <div className="relative z-10 w-full max-w-2xl flex flex-col items-center justify-center text-center animate-fade-in">
@@ -220,18 +222,19 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
           <h1 className="text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-text-primary to-gold-accent drop-shadow-[0_0_15px_rgba(255,217,0,0.4)]">
             CRYPTO SLOTS
           </h1>
+           <p className="text-sm text-text-secondary">{isRealMoney ? 'Real Money' : 'Play Money'}</p>
         </div>
 
         <div className="w-full bg-gradient-to-b from-gray-800 to-gray-900 p-4 sm:p-6 rounded-2xl shadow-2xl border-4 border-gold-accent/50">
              <div className="grid grid-cols-2 gap-4 mb-4 text-white">
                 <div className="bg-black/50 p-2 rounded-lg border border-brand-border">
                     <p className="text-xs text-text-secondary uppercase">Balance</p>
-                    <p className="text-xl sm:text-2xl font-mono font-bold">${balance.toLocaleString()}</p>
+                    <p className="text-xl sm:text-2xl font-mono font-bold">{currencySymbol}{formatAmount(balance)}</p>
                 </div>
                  <div className="bg-black/50 p-2 rounded-lg border border-brand-border">
                     <p className="text-xs text-text-secondary uppercase">Win</p>
                      <p className={`text-xl sm:text-2xl font-mono font-bold transition-colors ${winAmount && winAmount > 0 ? 'text-success animate-pulse' : 'text-white'}`}>
-                        {winAmount !== null ? `$${winAmount.toLocaleString()}`: '$0'}
+                        {currencySymbol}{winAmount !== null ? formatAmount(winAmount) : '0'}
                     </p>
                 </div>
             </div>
@@ -241,7 +244,6 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
                 <Reel symbols={reels[0]} spinning={spinning} reelId={0} />
                 <Reel symbols={reels[1]} spinning={spinning} reelId={1} />
                 <Reel symbols={reels[2]} spinning={spinning} reelId={2} />
-                 {/* Winning line indicators */}
                 <div className="absolute inset-x-4 inset-y-0 z-20 pointer-events-none">
                     <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
                         {winningLines.map(lineId => {
@@ -267,7 +269,7 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
                      <button onClick={() => changeBet('down')} disabled={spinning || isAutoSpinning || betIndex === 0} className="px-4 py-2 bg-surface hover:bg-background-light rounded-md font-bold text-lg disabled:opacity-50">-</button>
                      <div className="text-center">
                         <p className="text-sm text-text-secondary uppercase">Bet</p>
-                        <p className="text-2xl font-mono">${betAmount.toLocaleString()}</p>
+                        <p className="text-2xl font-mono">{currencySymbol}{formatAmount(betAmount)}</p>
                     </div>
                      <button onClick={() => changeBet('up')} disabled={spinning || isAutoSpinning || betIndex === betLevels.length - 1} className="px-4 py-2 bg-surface hover:bg-background-light rounded-md font-bold text-lg disabled:opacity-50">+</button>
                 </div>
@@ -293,6 +295,7 @@ const Slots: React.FC<SlotsProps> = ({ onExit, balance, setBalance }) => {
                 </div>
             </div>
         </div>
+        <button onClick={onExit} className="mt-4 flex items-center space-x-2 px-3 py-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors text-sm"><ExitIcon/><span>Лобби</span></button>
       </div>
     </div>
   );

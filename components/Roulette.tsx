@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import { ExitIcon } from './Icons';
 import { toast } from 'sonner';
-import { AssetContext } from '../contexts/AssetContext';
+import { GameMode } from '../types';
 
 interface RouletteProps {
   onExit: () => void;
-  balance: number;
-  setBalance: (updater: (prevBalance: number) => number) => void;
+  gameMode: GameMode;
+  realMoneyBalance: number;
+  playMoneyBalance: number;
+  setRealMoneyBalance: (updater: (prevBalance: number) => number) => void;
+  setPlayMoneyBalance: (updater: (prevBalance: number) => number) => void;
 }
 
 type BetType = 'straight' | 'red' | 'black' | 'even' | 'odd' | 'low' | 'high' | 'dozen1' | 'dozen2' | 'dozen3' | 'col1' | 'col2' | 'col3';
@@ -25,10 +28,16 @@ const getNumberColor = (num: number) => {
   return redNumbers.includes(num) ? 'red' : 'black';
 };
 
-const chipValues = [10, 25, 100, 500];
+const chipValuesPlayMoney = [10, 25, 100, 500];
+const chipValuesRealMoney = [0.1, 0.5, 1, 5];
 
-const Roulette: React.FC<RouletteProps> = ({ onExit, balance, setBalance }) => {
-  const { assets } = useContext(AssetContext);
+const Roulette: React.FC<RouletteProps> = ({ onExit, gameMode, realMoneyBalance, playMoneyBalance, setRealMoneyBalance, setPlayMoneyBalance }) => {
+  const isRealMoney = gameMode === GameMode.REAL_MONEY;
+  const balance = isRealMoney ? realMoneyBalance : playMoneyBalance;
+  const setBalance = isRealMoney ? setRealMoneyBalance : setPlayMoneyBalance;
+  const chipValues = isRealMoney ? chipValuesRealMoney : chipValuesPlayMoney;
+  const currencySymbol = isRealMoney ? 'TON' : '$';
+
   const [bets, setBets] = useState<Bets>({});
   const [chipIndex, setChipIndex] = useState(0);
   const selectedChip = chipValues[chipIndex];
@@ -173,7 +182,7 @@ const Roulette: React.FC<RouletteProps> = ({ onExit, balance, setBalance }) => {
   );
 
   return (
-    <div className="w-full h-full bg-cover bg-center text-white flex flex-col items-center justify-center p-2 sm:p-4 font-sans overflow-hidden" style={{ backgroundImage: `url(${assets.tableBackgroundUrl})` }}>
+    <div className="w-full h-full text-white flex flex-col items-center justify-center p-2 sm:p-4 font-sans overflow-hidden">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-between">
@@ -182,11 +191,11 @@ const Roulette: React.FC<RouletteProps> = ({ onExit, balance, setBalance }) => {
             <button onClick={onExit} className="flex items-center space-x-2 px-3 py-2 bg-black/50 hover:bg-black/80 rounded-lg transition-colors text-sm"><ExitIcon/><span>Лобби</span></button>
             <div className="text-center">
                 <h1 className="text-3xl font-black text-gold-accent">РУЛЕТКА</h1>
-                <p className="text-sm text-text-secondary">Европейская</p>
+                <p className="text-sm text-text-secondary">{isRealMoney ? 'Real Money' : 'Play Money'}</p>
             </div>
             <div className="w-[100px] text-right">
                 <p className="text-xs text-text-secondary uppercase">Баланс</p>
-                <p className="text-lg font-mono font-bold">${balance.toLocaleString()}</p>
+                <p className="text-lg font-mono font-bold">{currencySymbol}{isRealMoney ? balance.toFixed(2) : balance.toLocaleString()}</p>
             </div>
         </div>
 
@@ -248,21 +257,20 @@ const Roulette: React.FC<RouletteProps> = ({ onExit, balance, setBalance }) => {
             <div className="flex items-center gap-2 sm:gap-4 my-2 sm:my-0">
                 <div className="text-center">
                     <p className="text-xs uppercase">Bet</p>
-                    <p className="font-mono text-lg">${totalBet.toLocaleString()}</p>
+                    <p className="font-mono text-lg">{currencySymbol}{isRealMoney ? totalBet.toFixed(2) : totalBet.toLocaleString()}</p>
                 </div>
                 <div className="text-center text-success">
                     <p className="text-xs uppercase">Win</p>
-                    <p className="font-mono text-lg">${winAmount.toLocaleString()}</p>
+                    <p className="font-mono text-lg">{currencySymbol}{isRealMoney ? winAmount.toFixed(2) : winAmount.toLocaleString()}</p>
                 </div>
             </div>
 
             <div className="flex items-center gap-2">
                  <div className="flex items-center gap-1 bg-surface p-1 rounded-lg">
                     {chipValues.map((val, i) => (
-                        <button key={val} onClick={() => setChipIndex(i)} className={`w-8 h-8 rounded-full text-xs font-bold transition-all ${chipIndex === i ? 'bg-primary-accent text-black scale-110' : 'bg-background-light'}`}>{val}</button>
+                        <button key={val} onClick={() => setChipIndex(i)} className={`w-10 h-8 rounded-full text-xs font-bold transition-all ${chipIndex === i ? 'bg-primary-accent text-black scale-110' : 'bg-background-light'}`}>{val}</button>
                     ))}
                  </div>
-                 {/* FIX: Replaced non-existent `Button` component with styled `<button>` elements. */}
                  <button onClick={clearBets} disabled={phase !== 'betting'} className="px-4 py-2 bg-surface hover:bg-background-light rounded-md font-semibold text-sm transition-colors disabled:opacity-50">Clear</button>
                  <button onClick={rebet} disabled={phase !== 'betting'} className="px-4 py-2 bg-surface hover:bg-background-light rounded-md font-semibold text-sm transition-colors disabled:opacity-50">Rebet</button>
                  <button onClick={handleSpin} disabled={phase !== 'betting'} className="py-2 px-8 bg-success text-black hover:bg-success/90 font-bold rounded-lg shadow-lg shadow-success/20 transition-all transform hover:scale-105 disabled:from-gray-600 disabled:to-gray-700 disabled:text-text-secondary disabled:opacity-50 disabled:scale-100 disabled:shadow-none">Spin</button>

@@ -106,12 +106,24 @@ export interface IconAssets {
     iconBank: string;
 }
 
+export interface LotteryPrize {
+    id?: number;
+    label: string;
+    multiplier: number;
+    weight: number;
+}
+
+
 export interface GameAssets extends IconAssets {
   cardBackUrl: string;
   tableBackgroundUrl: string;
   godModePassword: string;
   cardFaces: { [suit in Suit]?: { [rank in Rank]?: string } };
   slotSymbols: SlotSymbol[];
+  lotteryTicketPricePlayMoney: number;
+  lotteryTicketPriceRealMoney: number;
+  lotteryPrizesPlayMoney: LotteryPrize[];
+  lotteryPrizesRealMoney: LotteryPrize[];
 }
 
 export interface HandResult {
